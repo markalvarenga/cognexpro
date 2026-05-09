@@ -64,7 +64,7 @@ export const csTestConnection = createServerFn({ method: "POST" })
 export const csSyncStatements = createServerFn({ method: "POST" })
   .middleware([attachSupabaseAuthHeader, requireSupabaseAuth])
   .inputValidator((d) =>
-    z.object({ from: z.string().optional(), to: z.string().optional() }).parse(d ?? {})
+    z.object({ from: z.string().optional(), to: z.string().optional() }).parse(d ?? {}),
   )
   .handler(async ({ data, context }) => {
     const { supabase, userId } = context as any;
@@ -82,7 +82,9 @@ export const csSyncStatements = createServerFn({ method: "POST" })
       const items: any[] = Array.isArray(resp?.data) ? resp.data : Array.isArray(resp) ? resp : [];
 
       for (const it of items) {
-        const externalId = String(it.id ?? it.transaction_id ?? `${it.posted_at}-${it.amount}-${it.description}`);
+        const externalId = String(
+          it.id ?? it.transaction_id ?? `${it.posted_at}-${it.amount}-${it.description}`,
+        );
         const row = {
           user_id: userId,
           external_id: externalId,
@@ -106,7 +108,10 @@ export const csSyncStatements = createServerFn({ method: "POST" })
     }
 
     await supabase.from("cs_sync_log").insert({
-      user_id: userId, status, imported, message,
+      user_id: userId,
+      status,
+      imported,
+      message,
     });
 
     return { status, imported, message, from, to };
