@@ -7,10 +7,11 @@ function getCsConfig() {
   const apiKey = process.env.CONTA_SIMPLES_API_KEY;
   const apiSecret = process.env.CONTA_SIMPLES_API_SECRET;
   const env = (process.env.CONTA_SIMPLES_ENV ?? "sandbox").toLowerCase();
+  const customBaseUrl = process.env.CONTA_SIMPLES_BASE_URL?.replace(/\/$/, "");
   const baseUrl =
-    env === "production" || env === "producao" || env === "prod"
+    customBaseUrl ?? (env === "production" || env === "producao" || env === "prod"
       ? "https://api.contasimples.com"
-      : "https://api-sandbox.contasimples.com";
+      : "https://api-sandbox.contasimples.com");
   if (!apiKey || !apiSecret) throw new Error("Conta Simples credentials not configured");
   return { apiKey, apiSecret, baseUrl, env };
 }
@@ -22,6 +23,7 @@ async function csFetch(path: string, init: RequestInit = {}) {
     headers: {
       "Content-Type": "application/json",
       Accept: "application/json",
+      "User-Agent": "Lovable-Conta-Simples-Integration/1.0",
       "X-API-Key": apiKey,
       "X-API-Secret": apiSecret,
       ...(init.headers ?? {}),
@@ -31,6 +33,11 @@ async function csFetch(path: string, init: RequestInit = {}) {
   let json: any = null;
   try { json = text ? JSON.parse(text) : null; } catch { /* ignore */ }
   if (!res.ok) {
+    if (res.status === 403 && /cloudflare|just a moment|challenge-platform|cdn-cgi/i.test(text)) {
+      throw new Error(
+        "Conta Simples 403: o endpoint de produção bloqueou a chamada por proteção Cloudflare antes de validar as credenciais. A integração está apontando para produção; peça à Conta Simples a liberação/allowlist do backend do app ou uma URL base de API sem desafio Cloudflare e configure em CONTA_SIMPLES_BASE_URL."
+      );
+    }
     throw new Error(`Conta Simples ${res.status}: ${json?.message ?? text ?? res.statusText}`);
   }
   return json;
