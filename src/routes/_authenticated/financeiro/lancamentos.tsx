@@ -234,8 +234,10 @@ function ContaSimplesPanel() {
   const fetchStmts = useServerFn(getCsStatements);
   const fetchLog = useServerFn(getCsSyncLog);
 
-  const stmts = useQuery({ queryKey: ["cs-stmts"], queryFn: () => fetchStmts() });
-  const log = useQuery({ queryKey: ["cs-log"], queryFn: () => fetchLog() });
+  const stmts = useQuery({ queryKey: ["cs-stmts"], queryFn: async () => (await fetchStmts()) ?? [] });
+  const log = useQuery({ queryKey: ["cs-log"], queryFn: async () => (await fetchLog()) ?? [] });
+  const stmtsArr: any[] = Array.isArray(stmts.data) ? stmts.data : [];
+  const logArr: any[] = Array.isArray(log.data) ? log.data : [];
 
   const m = useMutation({
     mutationFn: () => sync({ data: {} }),
@@ -274,7 +276,7 @@ function ContaSimplesPanel() {
             </tr>
           </thead>
           <tbody>
-            {(stmts.data ?? []).map((s: any) => (
+            {stmtsArr.map((s: any) => (
               <tr key={s.id} className="border-b border-border last:border-0">
                 <td className="p-3 text-muted-foreground">{fmtDate(s.posted_at)}</td>
                 <td className="p-3">{s.description}</td>
