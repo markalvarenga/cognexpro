@@ -1,6 +1,7 @@
 import { createServerFn } from "@tanstack/react-start";
 import { z } from "zod";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
+import { attachSupabaseAuthHeader } from "./supabase-auth-header";
 
 function getCsConfig() {
   const apiKey = process.env.CONTA_SIMPLES_API_KEY;
@@ -36,7 +37,7 @@ async function csFetch(path: string, init: RequestInit = {}) {
 }
 
 export const csTestConnection = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([attachSupabaseAuthHeader, requireSupabaseAuth])
   .handler(async () => {
     try {
       const { env, baseUrl } = getCsConfig();
@@ -49,7 +50,7 @@ export const csTestConnection = createServerFn({ method: "POST" })
   });
 
 export const csSyncStatements = createServerFn({ method: "POST" })
-  .middleware([requireSupabaseAuth])
+  .middleware([attachSupabaseAuthHeader, requireSupabaseAuth])
   .inputValidator((d) =>
     z.object({ from: z.string().optional(), to: z.string().optional() }).parse(d ?? {})
   )
@@ -100,7 +101,7 @@ export const csSyncStatements = createServerFn({ method: "POST" })
   });
 
 export const getCsStatements = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([attachSupabaseAuthHeader, requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { supabase, userId } = context as any;
     const { data, error } = await supabase
@@ -114,7 +115,7 @@ export const getCsStatements = createServerFn({ method: "GET" })
   });
 
 export const getCsSyncLog = createServerFn({ method: "GET" })
-  .middleware([requireSupabaseAuth])
+  .middleware([attachSupabaseAuthHeader, requireSupabaseAuth])
   .handler(async ({ context }) => {
     const { supabase, userId } = context as any;
     const { data } = await supabase
