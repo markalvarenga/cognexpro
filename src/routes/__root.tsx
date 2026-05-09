@@ -77,10 +77,14 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       { title: "COGNEX — Segundo Cérebro" },
       { name: "description", content: "Plataforma de gestão para agência de marketing digital especializada em tráfego pago." },
       { property: "og:title", content: "COGNEX — Segundo Cérebro" },
-      { property: "og:description", content: "Plataforma de gestão para agência de marketing digital." },
+      { property: "og:description", content: "Plataforma de gestão para agência de marketing digital especializada em tráfego pago." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "COGNEX — Segundo Cérebro" },
+      { name: "twitter:description", content: "Plataforma de gestão para agência de marketing digital especializada em tráfego pago." },
+      { property: "og:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/acc36681-3763-4a44-884a-75b56584c12d" },
+      { name: "twitter:image", content: "https://storage.googleapis.com/gpt-engineer-file-uploads/attachments/og-images/acc36681-3763-4a44-884a-75b56584c12d" },
     ],
     links: [
       {
