@@ -17,16 +17,46 @@ function getCsConfig() {
   return { apiKey, apiSecret, baseUrl, env };
 }
 
-async function csFetch(path: string, init: RequestInit = {}) {
+const USER_AGENT = "Lovable-Conta-Simples-Integration/1.0";
+
+let tokenCache: { token: string; expiresAt: number } | null = null;
+
+async function getAccessToken(): Promise<string> {
+  const now = Date.now();
+  if (tokenCache && tokenCache.expiresAt > now + 30_000) return tokenCache.token;
   const { apiKey, apiSecret, baseUrl } = getCsConfig();
+  const basic = Buffer.from(`${apiKey}:${apiSecret}`).toString("base64");
+  const res = await fetch(`${baseUrl}/oauth/v1/access-token`, {
+    method: "POST",
+    headers: {
+      Authorization: `Basic ${basic}`,
+      "Content-Type": "application/x-www-form-urlencoded",
+      "User-Agent": USER_AGENT,
+    },
+    body: "grant_type=client_credentials",
+  });
+  const text = await res.text();
+  if (!res.ok) {
+    throw new Error(`Conta Simples OAuth ${res.status}: ${text || res.statusText}`);
+  }
+  const json = JSON.parse(text) as { access_token: string; expires_in: number };
+  tokenCache = {
+    token: json.access_token,
+    expiresAt: now + (json.expires_in ?? 1800) * 1000,
+  };
+  return tokenCache.token;
+}
+
+async function csFetch(path: string, init: RequestInit = {}) {
+  const { baseUrl } = getCsConfig();
+  const token = await getAccessToken();
   const res = await fetch(`${baseUrl}${path}`, {
     ...init,
     headers: {
       "Content-Type": "application/json",
       Accept: "application/json",
-      "User-Agent": "Lovable-Conta-Simples-Integration/1.0",
-      "X-API-Key": apiKey,
-      "X-API-Secret": apiSecret,
+      "User-Agent": USER_AGENT,
+      Authorization: `Bearer ${token}`,
       ...(init.headers ?? {}),
     },
   });
@@ -38,11 +68,6 @@ async function csFetch(path: string, init: RequestInit = {}) {
     /* ignore */
   }
   if (!res.ok) {
-    if (res.status === 403 && /cloudflare|just a moment|challenge-platform|cdn-cgi/i.test(text)) {
-      throw new Error(
-        "Conta Simples 403: o endpoint de produção bloqueou a chamada por proteção Cloudflare antes de validar as credenciais. A integração está apontando para produção; peça à Conta Simples a liberação/allowlist do backend do app ou uma URL base de API sem desafio Cloudflare e configure em CONTA_SIMPLES_BASE_URL.",
-      );
-    }
     throw new Error(`Conta Simples ${res.status}: ${json?.message ?? text ?? res.statusText}`);
   }
   return json;
@@ -53,9 +78,8 @@ export const csTestConnection = createServerFn({ method: "POST" })
   .handler(async () => {
     try {
       const { env, baseUrl } = getCsConfig();
-      // Light probe – many CS endpoints accept HEAD-style auth check via /v1/health or /v1/cards
-      const data = await csFetch("/v1/cards").catch(() => ({ ok: true }));
-      return { ok: true, env, baseUrl, sample: data };
+      const token = await getAccessToken();
+      return { ok: true, env, baseUrl, tokenPreview: token.slice(0, 12) + "..." };
     } catch (e: any) {
       return { ok: false, error: e.message ?? "Falha na conexão" };
     }
@@ -77,24 +101,31 @@ export const csSyncStatements = createServerFn({ method: "POST" })
     let status = "ok";
     let message = "";
     try {
-      const qs = new URLSearchParams({ from, to });
-      const resp = await csFetch(`/v1/credit-cards/statements?${qs.toString()}`);
-      const items: any[] = Array.isArray(resp?.data) ? resp.data : Array.isArray(resp) ? resp : [];
+      const items: any[] = [];
+      let nextPageStartKey: string | undefined;
+      do {
+        const qs = new URLSearchParams({ startDate: from, endDate: to, limit: "100" });
+        if (nextPageStartKey) qs.set("nextPageStartKey", nextPageStartKey);
+        const resp = await csFetch(`/statements/v1/credit-card?${qs.toString()}`);
+        const batch: any[] = Array.isArray(resp?.transactions) ? resp.transactions : [];
+        items.push(...batch);
+        nextPageStartKey = resp?.nextPageStartKey;
+      } while (nextPageStartKey);
 
       for (const it of items) {
-        const externalId = String(
-          it.id ?? it.transaction_id ?? `${it.posted_at}-${it.amount}-${it.description}`,
-        );
+        const externalId = String(it.id ?? `${it.transactionDate}-${it.amountBrl}-${it.merchant}`);
+        const masked = it.card?.maskedNumber ?? "";
+        const card_last4 = masked ? masked.replace(/\D/g, "").slice(-4) : null;
         const row = {
           user_id: userId,
           external_id: externalId,
-          card_last4: it.card_last4 ?? it.card?.last4 ?? null,
-          cardholder: it.cardholder ?? it.holder ?? null,
-          description: it.description ?? it.merchant ?? "Lançamento",
-          amount: Number(it.amount ?? 0),
+          card_last4,
+          cardholder: it.card?.responsibleName ?? null,
+          description: it.merchant ?? it.type ?? "Lançamento",
+          amount: Number(it.amountBrl ?? 0),
           installment: it.installment ?? null,
-          category: it.category ?? null,
-          posted_at: (it.posted_at ?? it.date ?? today.toISOString()).slice(0, 10),
+          category: it.category?.name ?? null,
+          posted_at: (it.transactionDate ?? today.toISOString()).slice(0, 10),
           raw: it,
         };
         const { error } = await supabase
