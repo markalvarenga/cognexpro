@@ -10,7 +10,7 @@ function getCsConfig() {
   const baseUrl =
     env === "production" || env === "producao" || env === "prod"
       ? "https://api.contasimples.com"
-      : "https://sandbox-api.contasimples.com";
+      : "https://api-sandbox.contasimples.com";
   if (!apiKey || !apiSecret) throw new Error("Conta Simples credentials not configured");
   return { apiKey, apiSecret, baseUrl, env };
 }
