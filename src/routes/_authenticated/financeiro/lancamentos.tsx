@@ -74,7 +74,7 @@ function Page() {
             </DialogTrigger>
             <DialogContent>
               <DialogHeader><DialogTitle>Novo lançamento</DialogTitle></DialogHeader>
-              <NewTxForm accounts={accounts} categories={categories} onSubmit={(p) => create.mutate(p)} loading={create.isPending} />
+              <NewTxForm accounts={accounts} categories={categories} onSubmit={(p: any) => create.mutate(p)} loading={create.isPending} />
             </DialogContent>
           </Dialog>
         }
