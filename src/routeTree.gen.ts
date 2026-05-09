@@ -11,8 +11,28 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as ResetPasswordRouteImport } from './routes/reset-password'
 import { Route as RegisterRouteImport } from './routes/register'
+import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedPerfilRouteImport } from './routes/_authenticated/perfil'
+import { Route as AuthenticatedNotificacoesRouteImport } from './routes/_authenticated/notificacoes'
+import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
+import { Route as AuthenticatedContingenciaRouteImport } from './routes/_authenticated/contingencia'
+import { Route as AuthenticatedTrafegoPlanejamentoRouteImport } from './routes/_authenticated/trafego/planejamento'
+import { Route as AuthenticatedTrafegoPerformanceRouteImport } from './routes/_authenticated/trafego/performance'
+import { Route as AuthenticatedTrafegoCriativosRouteImport } from './routes/_authenticated/trafego/criativos'
+import { Route as AuthenticatedTrafegoCampanhasRouteImport } from './routes/_authenticated/trafego/campanhas'
+import { Route as AuthenticatedOperacionalTarefasRouteImport } from './routes/_authenticated/operacional/tarefas'
+import { Route as AuthenticatedOperacionalKanbanRouteImport } from './routes/_authenticated/operacional/kanban'
+import { Route as AuthenticatedFinanceiroVisaoGeralRouteImport } from './routes/_authenticated/financeiro/visao-geral'
+import { Route as AuthenticatedFinanceiroRelatoriosRouteImport } from './routes/_authenticated/financeiro/relatorios'
+import { Route as AuthenticatedFinanceiroLancamentosRouteImport } from './routes/_authenticated/financeiro/lancamentos'
+import { Route as AuthenticatedFinanceiroFluxoDeCaixaRouteImport } from './routes/_authenticated/financeiro/fluxo-de-caixa'
+import { Route as AuthenticatedFinanceiroContasRouteImport } from './routes/_authenticated/financeiro/contas'
+import { Route as AuthenticatedConfiguracoesUsuariosRouteImport } from './routes/_authenticated/configuracoes/usuarios'
+import { Route as AuthenticatedConfiguracoesIntegracoesRouteImport } from './routes/_authenticated/configuracoes/integracoes'
+import { Route as AuthenticatedConfiguracoesEmpresaRouteImport } from './routes/_authenticated/configuracoes/empresa'
 
 const ResetPasswordRoute = ResetPasswordRouteImport.update({
   id: '/reset-password',
@@ -24,9 +44,18 @@ const RegisterRoute = RegisterRouteImport.update({
   path: '/register',
   getParentRoute: () => rootRouteImport,
 } as any)
+const OnboardingRoute = OnboardingRouteImport.update({
+  id: '/onboarding',
+  path: '/onboarding',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AuthenticatedRoute = AuthenticatedRouteImport.update({
+  id: '/_authenticated',
   getParentRoute: () => rootRouteImport,
 } as any)
 const IndexRoute = IndexRouteImport.update({
@@ -34,37 +63,274 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedPerfilRoute = AuthenticatedPerfilRouteImport.update({
+  id: '/perfil',
+  path: '/perfil',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedNotificacoesRoute =
+  AuthenticatedNotificacoesRouteImport.update({
+    id: '/notificacoes',
+    path: '/notificacoes',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedDashboardRoute = AuthenticatedDashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
+const AuthenticatedContingenciaRoute =
+  AuthenticatedContingenciaRouteImport.update({
+    id: '/contingencia',
+    path: '/contingencia',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedTrafegoPlanejamentoRoute =
+  AuthenticatedTrafegoPlanejamentoRouteImport.update({
+    id: '/trafego/planejamento',
+    path: '/trafego/planejamento',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedTrafegoPerformanceRoute =
+  AuthenticatedTrafegoPerformanceRouteImport.update({
+    id: '/trafego/performance',
+    path: '/trafego/performance',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedTrafegoCriativosRoute =
+  AuthenticatedTrafegoCriativosRouteImport.update({
+    id: '/trafego/criativos',
+    path: '/trafego/criativos',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedTrafegoCampanhasRoute =
+  AuthenticatedTrafegoCampanhasRouteImport.update({
+    id: '/trafego/campanhas',
+    path: '/trafego/campanhas',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedOperacionalTarefasRoute =
+  AuthenticatedOperacionalTarefasRouteImport.update({
+    id: '/operacional/tarefas',
+    path: '/operacional/tarefas',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedOperacionalKanbanRoute =
+  AuthenticatedOperacionalKanbanRouteImport.update({
+    id: '/operacional/kanban',
+    path: '/operacional/kanban',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedFinanceiroVisaoGeralRoute =
+  AuthenticatedFinanceiroVisaoGeralRouteImport.update({
+    id: '/financeiro/visao-geral',
+    path: '/financeiro/visao-geral',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedFinanceiroRelatoriosRoute =
+  AuthenticatedFinanceiroRelatoriosRouteImport.update({
+    id: '/financeiro/relatorios',
+    path: '/financeiro/relatorios',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedFinanceiroLancamentosRoute =
+  AuthenticatedFinanceiroLancamentosRouteImport.update({
+    id: '/financeiro/lancamentos',
+    path: '/financeiro/lancamentos',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedFinanceiroFluxoDeCaixaRoute =
+  AuthenticatedFinanceiroFluxoDeCaixaRouteImport.update({
+    id: '/financeiro/fluxo-de-caixa',
+    path: '/financeiro/fluxo-de-caixa',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedFinanceiroContasRoute =
+  AuthenticatedFinanceiroContasRouteImport.update({
+    id: '/financeiro/contas',
+    path: '/financeiro/contas',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedConfiguracoesUsuariosRoute =
+  AuthenticatedConfiguracoesUsuariosRouteImport.update({
+    id: '/configuracoes/usuarios',
+    path: '/configuracoes/usuarios',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedConfiguracoesIntegracoesRoute =
+  AuthenticatedConfiguracoesIntegracoesRouteImport.update({
+    id: '/configuracoes/integracoes',
+    path: '/configuracoes/integracoes',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedConfiguracoesEmpresaRoute =
+  AuthenticatedConfiguracoesEmpresaRouteImport.update({
+    id: '/configuracoes/empresa',
+    path: '/configuracoes/empresa',
+    getParentRoute: () => AuthenticatedRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/onboarding': typeof OnboardingRoute
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/contingencia': typeof AuthenticatedContingenciaRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/notificacoes': typeof AuthenticatedNotificacoesRoute
+  '/perfil': typeof AuthenticatedPerfilRoute
+  '/configuracoes/empresa': typeof AuthenticatedConfiguracoesEmpresaRoute
+  '/configuracoes/integracoes': typeof AuthenticatedConfiguracoesIntegracoesRoute
+  '/configuracoes/usuarios': typeof AuthenticatedConfiguracoesUsuariosRoute
+  '/financeiro/contas': typeof AuthenticatedFinanceiroContasRoute
+  '/financeiro/fluxo-de-caixa': typeof AuthenticatedFinanceiroFluxoDeCaixaRoute
+  '/financeiro/lancamentos': typeof AuthenticatedFinanceiroLancamentosRoute
+  '/financeiro/relatorios': typeof AuthenticatedFinanceiroRelatoriosRoute
+  '/financeiro/visao-geral': typeof AuthenticatedFinanceiroVisaoGeralRoute
+  '/operacional/kanban': typeof AuthenticatedOperacionalKanbanRoute
+  '/operacional/tarefas': typeof AuthenticatedOperacionalTarefasRoute
+  '/trafego/campanhas': typeof AuthenticatedTrafegoCampanhasRoute
+  '/trafego/criativos': typeof AuthenticatedTrafegoCriativosRoute
+  '/trafego/performance': typeof AuthenticatedTrafegoPerformanceRoute
+  '/trafego/planejamento': typeof AuthenticatedTrafegoPlanejamentoRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/login': typeof LoginRoute
+  '/onboarding': typeof OnboardingRoute
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/contingencia': typeof AuthenticatedContingenciaRoute
+  '/dashboard': typeof AuthenticatedDashboardRoute
+  '/notificacoes': typeof AuthenticatedNotificacoesRoute
+  '/perfil': typeof AuthenticatedPerfilRoute
+  '/configuracoes/empresa': typeof AuthenticatedConfiguracoesEmpresaRoute
+  '/configuracoes/integracoes': typeof AuthenticatedConfiguracoesIntegracoesRoute
+  '/configuracoes/usuarios': typeof AuthenticatedConfiguracoesUsuariosRoute
+  '/financeiro/contas': typeof AuthenticatedFinanceiroContasRoute
+  '/financeiro/fluxo-de-caixa': typeof AuthenticatedFinanceiroFluxoDeCaixaRoute
+  '/financeiro/lancamentos': typeof AuthenticatedFinanceiroLancamentosRoute
+  '/financeiro/relatorios': typeof AuthenticatedFinanceiroRelatoriosRoute
+  '/financeiro/visao-geral': typeof AuthenticatedFinanceiroVisaoGeralRoute
+  '/operacional/kanban': typeof AuthenticatedOperacionalKanbanRoute
+  '/operacional/tarefas': typeof AuthenticatedOperacionalTarefasRoute
+  '/trafego/campanhas': typeof AuthenticatedTrafegoCampanhasRoute
+  '/trafego/criativos': typeof AuthenticatedTrafegoCriativosRoute
+  '/trafego/performance': typeof AuthenticatedTrafegoPerformanceRoute
+  '/trafego/planejamento': typeof AuthenticatedTrafegoPlanejamentoRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/_authenticated': typeof AuthenticatedRouteWithChildren
   '/login': typeof LoginRoute
+  '/onboarding': typeof OnboardingRoute
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
+  '/_authenticated/contingencia': typeof AuthenticatedContingenciaRoute
+  '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
+  '/_authenticated/notificacoes': typeof AuthenticatedNotificacoesRoute
+  '/_authenticated/perfil': typeof AuthenticatedPerfilRoute
+  '/_authenticated/configuracoes/empresa': typeof AuthenticatedConfiguracoesEmpresaRoute
+  '/_authenticated/configuracoes/integracoes': typeof AuthenticatedConfiguracoesIntegracoesRoute
+  '/_authenticated/configuracoes/usuarios': typeof AuthenticatedConfiguracoesUsuariosRoute
+  '/_authenticated/financeiro/contas': typeof AuthenticatedFinanceiroContasRoute
+  '/_authenticated/financeiro/fluxo-de-caixa': typeof AuthenticatedFinanceiroFluxoDeCaixaRoute
+  '/_authenticated/financeiro/lancamentos': typeof AuthenticatedFinanceiroLancamentosRoute
+  '/_authenticated/financeiro/relatorios': typeof AuthenticatedFinanceiroRelatoriosRoute
+  '/_authenticated/financeiro/visao-geral': typeof AuthenticatedFinanceiroVisaoGeralRoute
+  '/_authenticated/operacional/kanban': typeof AuthenticatedOperacionalKanbanRoute
+  '/_authenticated/operacional/tarefas': typeof AuthenticatedOperacionalTarefasRoute
+  '/_authenticated/trafego/campanhas': typeof AuthenticatedTrafegoCampanhasRoute
+  '/_authenticated/trafego/criativos': typeof AuthenticatedTrafegoCriativosRoute
+  '/_authenticated/trafego/performance': typeof AuthenticatedTrafegoPerformanceRoute
+  '/_authenticated/trafego/planejamento': typeof AuthenticatedTrafegoPlanejamentoRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/login' | '/register' | '/reset-password'
+  fullPaths:
+    | '/'
+    | '/login'
+    | '/onboarding'
+    | '/register'
+    | '/reset-password'
+    | '/contingencia'
+    | '/dashboard'
+    | '/notificacoes'
+    | '/perfil'
+    | '/configuracoes/empresa'
+    | '/configuracoes/integracoes'
+    | '/configuracoes/usuarios'
+    | '/financeiro/contas'
+    | '/financeiro/fluxo-de-caixa'
+    | '/financeiro/lancamentos'
+    | '/financeiro/relatorios'
+    | '/financeiro/visao-geral'
+    | '/operacional/kanban'
+    | '/operacional/tarefas'
+    | '/trafego/campanhas'
+    | '/trafego/criativos'
+    | '/trafego/performance'
+    | '/trafego/planejamento'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/login' | '/register' | '/reset-password'
-  id: '__root__' | '/' | '/login' | '/register' | '/reset-password'
+  to:
+    | '/'
+    | '/login'
+    | '/onboarding'
+    | '/register'
+    | '/reset-password'
+    | '/contingencia'
+    | '/dashboard'
+    | '/notificacoes'
+    | '/perfil'
+    | '/configuracoes/empresa'
+    | '/configuracoes/integracoes'
+    | '/configuracoes/usuarios'
+    | '/financeiro/contas'
+    | '/financeiro/fluxo-de-caixa'
+    | '/financeiro/lancamentos'
+    | '/financeiro/relatorios'
+    | '/financeiro/visao-geral'
+    | '/operacional/kanban'
+    | '/operacional/tarefas'
+    | '/trafego/campanhas'
+    | '/trafego/criativos'
+    | '/trafego/performance'
+    | '/trafego/planejamento'
+  id:
+    | '__root__'
+    | '/'
+    | '/_authenticated'
+    | '/login'
+    | '/onboarding'
+    | '/register'
+    | '/reset-password'
+    | '/_authenticated/contingencia'
+    | '/_authenticated/dashboard'
+    | '/_authenticated/notificacoes'
+    | '/_authenticated/perfil'
+    | '/_authenticated/configuracoes/empresa'
+    | '/_authenticated/configuracoes/integracoes'
+    | '/_authenticated/configuracoes/usuarios'
+    | '/_authenticated/financeiro/contas'
+    | '/_authenticated/financeiro/fluxo-de-caixa'
+    | '/_authenticated/financeiro/lancamentos'
+    | '/_authenticated/financeiro/relatorios'
+    | '/_authenticated/financeiro/visao-geral'
+    | '/_authenticated/operacional/kanban'
+    | '/_authenticated/operacional/tarefas'
+    | '/_authenticated/trafego/campanhas'
+    | '/_authenticated/trafego/criativos'
+    | '/_authenticated/trafego/performance'
+    | '/_authenticated/trafego/planejamento'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AuthenticatedRoute: typeof AuthenticatedRouteWithChildren
   LoginRoute: typeof LoginRoute
+  OnboardingRoute: typeof OnboardingRoute
   RegisterRoute: typeof RegisterRoute
   ResetPasswordRoute: typeof ResetPasswordRoute
 }
@@ -85,11 +351,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof RegisterRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/onboarding': {
+      id: '/onboarding'
+      path: '/onboarding'
+      fullPath: '/onboarding'
+      preLoaderRoute: typeof OnboardingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/login': {
       id: '/login'
       path: '/login'
       fullPath: '/login'
       preLoaderRoute: typeof LoginRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/_authenticated': {
+      id: '/_authenticated'
+      path: ''
+      fullPath: '/'
+      preLoaderRoute: typeof AuthenticatedRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/': {
@@ -99,12 +379,193 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/perfil': {
+      id: '/_authenticated/perfil'
+      path: '/perfil'
+      fullPath: '/perfil'
+      preLoaderRoute: typeof AuthenticatedPerfilRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/notificacoes': {
+      id: '/_authenticated/notificacoes'
+      path: '/notificacoes'
+      fullPath: '/notificacoes'
+      preLoaderRoute: typeof AuthenticatedNotificacoesRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/dashboard': {
+      id: '/_authenticated/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof AuthenticatedDashboardRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/contingencia': {
+      id: '/_authenticated/contingencia'
+      path: '/contingencia'
+      fullPath: '/contingencia'
+      preLoaderRoute: typeof AuthenticatedContingenciaRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/trafego/planejamento': {
+      id: '/_authenticated/trafego/planejamento'
+      path: '/trafego/planejamento'
+      fullPath: '/trafego/planejamento'
+      preLoaderRoute: typeof AuthenticatedTrafegoPlanejamentoRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/trafego/performance': {
+      id: '/_authenticated/trafego/performance'
+      path: '/trafego/performance'
+      fullPath: '/trafego/performance'
+      preLoaderRoute: typeof AuthenticatedTrafegoPerformanceRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/trafego/criativos': {
+      id: '/_authenticated/trafego/criativos'
+      path: '/trafego/criativos'
+      fullPath: '/trafego/criativos'
+      preLoaderRoute: typeof AuthenticatedTrafegoCriativosRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/trafego/campanhas': {
+      id: '/_authenticated/trafego/campanhas'
+      path: '/trafego/campanhas'
+      fullPath: '/trafego/campanhas'
+      preLoaderRoute: typeof AuthenticatedTrafegoCampanhasRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/operacional/tarefas': {
+      id: '/_authenticated/operacional/tarefas'
+      path: '/operacional/tarefas'
+      fullPath: '/operacional/tarefas'
+      preLoaderRoute: typeof AuthenticatedOperacionalTarefasRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/operacional/kanban': {
+      id: '/_authenticated/operacional/kanban'
+      path: '/operacional/kanban'
+      fullPath: '/operacional/kanban'
+      preLoaderRoute: typeof AuthenticatedOperacionalKanbanRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/financeiro/visao-geral': {
+      id: '/_authenticated/financeiro/visao-geral'
+      path: '/financeiro/visao-geral'
+      fullPath: '/financeiro/visao-geral'
+      preLoaderRoute: typeof AuthenticatedFinanceiroVisaoGeralRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/financeiro/relatorios': {
+      id: '/_authenticated/financeiro/relatorios'
+      path: '/financeiro/relatorios'
+      fullPath: '/financeiro/relatorios'
+      preLoaderRoute: typeof AuthenticatedFinanceiroRelatoriosRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/financeiro/lancamentos': {
+      id: '/_authenticated/financeiro/lancamentos'
+      path: '/financeiro/lancamentos'
+      fullPath: '/financeiro/lancamentos'
+      preLoaderRoute: typeof AuthenticatedFinanceiroLancamentosRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/financeiro/fluxo-de-caixa': {
+      id: '/_authenticated/financeiro/fluxo-de-caixa'
+      path: '/financeiro/fluxo-de-caixa'
+      fullPath: '/financeiro/fluxo-de-caixa'
+      preLoaderRoute: typeof AuthenticatedFinanceiroFluxoDeCaixaRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/financeiro/contas': {
+      id: '/_authenticated/financeiro/contas'
+      path: '/financeiro/contas'
+      fullPath: '/financeiro/contas'
+      preLoaderRoute: typeof AuthenticatedFinanceiroContasRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/configuracoes/usuarios': {
+      id: '/_authenticated/configuracoes/usuarios'
+      path: '/configuracoes/usuarios'
+      fullPath: '/configuracoes/usuarios'
+      preLoaderRoute: typeof AuthenticatedConfiguracoesUsuariosRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/configuracoes/integracoes': {
+      id: '/_authenticated/configuracoes/integracoes'
+      path: '/configuracoes/integracoes'
+      fullPath: '/configuracoes/integracoes'
+      preLoaderRoute: typeof AuthenticatedConfiguracoesIntegracoesRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/configuracoes/empresa': {
+      id: '/_authenticated/configuracoes/empresa'
+      path: '/configuracoes/empresa'
+      fullPath: '/configuracoes/empresa'
+      preLoaderRoute: typeof AuthenticatedConfiguracoesEmpresaRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
   }
 }
 
+interface AuthenticatedRouteChildren {
+  AuthenticatedContingenciaRoute: typeof AuthenticatedContingenciaRoute
+  AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
+  AuthenticatedNotificacoesRoute: typeof AuthenticatedNotificacoesRoute
+  AuthenticatedPerfilRoute: typeof AuthenticatedPerfilRoute
+  AuthenticatedConfiguracoesEmpresaRoute: typeof AuthenticatedConfiguracoesEmpresaRoute
+  AuthenticatedConfiguracoesIntegracoesRoute: typeof AuthenticatedConfiguracoesIntegracoesRoute
+  AuthenticatedConfiguracoesUsuariosRoute: typeof AuthenticatedConfiguracoesUsuariosRoute
+  AuthenticatedFinanceiroContasRoute: typeof AuthenticatedFinanceiroContasRoute
+  AuthenticatedFinanceiroFluxoDeCaixaRoute: typeof AuthenticatedFinanceiroFluxoDeCaixaRoute
+  AuthenticatedFinanceiroLancamentosRoute: typeof AuthenticatedFinanceiroLancamentosRoute
+  AuthenticatedFinanceiroRelatoriosRoute: typeof AuthenticatedFinanceiroRelatoriosRoute
+  AuthenticatedFinanceiroVisaoGeralRoute: typeof AuthenticatedFinanceiroVisaoGeralRoute
+  AuthenticatedOperacionalKanbanRoute: typeof AuthenticatedOperacionalKanbanRoute
+  AuthenticatedOperacionalTarefasRoute: typeof AuthenticatedOperacionalTarefasRoute
+  AuthenticatedTrafegoCampanhasRoute: typeof AuthenticatedTrafegoCampanhasRoute
+  AuthenticatedTrafegoCriativosRoute: typeof AuthenticatedTrafegoCriativosRoute
+  AuthenticatedTrafegoPerformanceRoute: typeof AuthenticatedTrafegoPerformanceRoute
+  AuthenticatedTrafegoPlanejamentoRoute: typeof AuthenticatedTrafegoPlanejamentoRoute
+}
+
+const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
+  AuthenticatedContingenciaRoute: AuthenticatedContingenciaRoute,
+  AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
+  AuthenticatedNotificacoesRoute: AuthenticatedNotificacoesRoute,
+  AuthenticatedPerfilRoute: AuthenticatedPerfilRoute,
+  AuthenticatedConfiguracoesEmpresaRoute:
+    AuthenticatedConfiguracoesEmpresaRoute,
+  AuthenticatedConfiguracoesIntegracoesRoute:
+    AuthenticatedConfiguracoesIntegracoesRoute,
+  AuthenticatedConfiguracoesUsuariosRoute:
+    AuthenticatedConfiguracoesUsuariosRoute,
+  AuthenticatedFinanceiroContasRoute: AuthenticatedFinanceiroContasRoute,
+  AuthenticatedFinanceiroFluxoDeCaixaRoute:
+    AuthenticatedFinanceiroFluxoDeCaixaRoute,
+  AuthenticatedFinanceiroLancamentosRoute:
+    AuthenticatedFinanceiroLancamentosRoute,
+  AuthenticatedFinanceiroRelatoriosRoute:
+    AuthenticatedFinanceiroRelatoriosRoute,
+  AuthenticatedFinanceiroVisaoGeralRoute:
+    AuthenticatedFinanceiroVisaoGeralRoute,
+  AuthenticatedOperacionalKanbanRoute: AuthenticatedOperacionalKanbanRoute,
+  AuthenticatedOperacionalTarefasRoute: AuthenticatedOperacionalTarefasRoute,
+  AuthenticatedTrafegoCampanhasRoute: AuthenticatedTrafegoCampanhasRoute,
+  AuthenticatedTrafegoCriativosRoute: AuthenticatedTrafegoCriativosRoute,
+  AuthenticatedTrafegoPerformanceRoute: AuthenticatedTrafegoPerformanceRoute,
+  AuthenticatedTrafegoPlanejamentoRoute: AuthenticatedTrafegoPlanejamentoRoute,
+}
+
+const AuthenticatedRouteWithChildren = AuthenticatedRoute._addFileChildren(
+  AuthenticatedRouteChildren,
+)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AuthenticatedRoute: AuthenticatedRouteWithChildren,
   LoginRoute: LoginRoute,
+  OnboardingRoute: OnboardingRoute,
   RegisterRoute: RegisterRoute,
   ResetPasswordRoute: ResetPasswordRoute,
 }
