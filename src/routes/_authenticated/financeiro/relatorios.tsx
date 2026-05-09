@@ -54,11 +54,12 @@ function Page() {
 
 function Section({ title, rows, tone }: { title: string; rows: { k: string; v: number }[]; tone: "success" | "destructive" }) {
   const total = rows.reduce((s, r) => s + r.v, 0);
+  const colorVar = tone === "success" ? "var(--success)" : "var(--destructive)";
   return (
     <div className="bg-card border border-border rounded-xl p-5">
       <div className="flex items-center justify-between mb-3">
         <h3 className="font-semibold">{title}</h3>
-        <span className={`text-sm font-semibold text-${tone}`}>{brl(total)}</span>
+        <span className="text-sm font-semibold" style={{ color: colorVar }}>{brl(total)}</span>
       </div>
       <div className="space-y-2">
         {rows.map((r) => (
@@ -67,7 +68,7 @@ function Section({ title, rows, tone }: { title: string; rows: { k: string; v: n
               <span>{r.k}</span><span className="text-muted-foreground">{brl(r.v)}</span>
             </div>
             <div className="h-1.5 bg-muted rounded-full mt-1 overflow-hidden">
-              <div className={`h-full bg-${tone}`} style={{ width: `${total > 0 ? (r.v / total) * 100 : 0}%` }} />
+              <div className="h-full" style={{ width: `${total > 0 ? (r.v / total) * 100 : 0}%`, backgroundColor: colorVar }} />
             </div>
           </div>
         ))}
