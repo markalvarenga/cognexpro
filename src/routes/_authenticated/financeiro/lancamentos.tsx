@@ -286,7 +286,7 @@ function ContaSimplesPanel() {
                 <td className="p-3 text-right font-semibold text-destructive">-{brl(s.amount)}</td>
               </tr>
             ))}
-            {(stmts.data ?? []).length === 0 && (
+            {stmtsArr.length === 0 && (
               <tr><td colSpan={6} className="p-10 text-center text-muted-foreground">Nenhuma fatura importada ainda. Clique em Sincronizar.</td></tr>
             )}
           </tbody>
@@ -296,7 +296,7 @@ function ContaSimplesPanel() {
       <div className="bg-card border border-border rounded-xl">
         <div className="px-4 py-3 border-b border-border font-semibold">Histórico de sincronizações</div>
         <div className="divide-y divide-border">
-          {(log.data ?? []).map((l: any) => (
+          {logArr.map((l: any) => (
             <div key={l.id} className="flex items-center justify-between p-3 text-sm">
               <div>
                 <Badge variant={l.status === "ok" ? "default" : "destructive"}>{l.status}</Badge>
@@ -306,7 +306,7 @@ function ContaSimplesPanel() {
               <div className="text-muted-foreground">{l.imported} importados</div>
             </div>
           ))}
-          {(log.data ?? []).length === 0 && <div className="p-6 text-center text-muted-foreground text-sm">Nenhuma sincronização ainda.</div>}
+          {logArr.length === 0 && <div className="p-6 text-center text-muted-foreground text-sm">Nenhuma sincronização ainda.</div>}
         </div>
       </div>
     </div>
