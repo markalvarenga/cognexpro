@@ -379,6 +379,78 @@ export type Database = {
         }
         Relationships: []
       }
+      cs_credit_card_statements: {
+        Row: {
+          amount: number
+          card_last4: string | null
+          cardholder: string | null
+          category: string | null
+          created_at: string | null
+          description: string | null
+          external_id: string | null
+          id: string
+          installment: string | null
+          posted_at: string
+          raw: Json | null
+          user_id: string
+        }
+        Insert: {
+          amount: number
+          card_last4?: string | null
+          cardholder?: string | null
+          category?: string | null
+          created_at?: string | null
+          description?: string | null
+          external_id?: string | null
+          id?: string
+          installment?: string | null
+          posted_at: string
+          raw?: Json | null
+          user_id: string
+        }
+        Update: {
+          amount?: number
+          card_last4?: string | null
+          cardholder?: string | null
+          category?: string | null
+          created_at?: string | null
+          description?: string | null
+          external_id?: string | null
+          id?: string
+          installment?: string | null
+          posted_at?: string
+          raw?: Json | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      cs_sync_log: {
+        Row: {
+          id: string
+          imported: number | null
+          message: string | null
+          ran_at: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          id?: string
+          imported?: number | null
+          message?: string | null
+          ran_at?: string | null
+          status: string
+          user_id: string
+        }
+        Update: {
+          id?: string
+          imported?: number | null
+          message?: string | null
+          ran_at?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       facebook_pages: {
         Row: {
           aparece_anuncios: string | null
