@@ -10,7 +10,7 @@ interface AuthCtx {
   session: Session | null;
   loading: boolean;
   roles: AppRole[];
-  profile: { full_name?: string; username?: string; theme_color?: string; onboarding_completed?: boolean } | null;
+  profile: { full_name?: string | null; username?: string | null; theme_color?: string | null; onboarding_completed?: boolean | null } | null;
   signOut: () => Promise<void>;
   refreshProfile: () => Promise<void>;
   hasRole: (r: AppRole) => boolean;
