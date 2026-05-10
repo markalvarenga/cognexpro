@@ -1,54 +1,93 @@
-# COGNEX — Plano de Construção
+## Fase 4 — Central de Contingência (layout profissional, tabelas enxutas)
 
-Plataforma SaaS de gestão para agência de tráfego pago, com 6 módulos principais (Dashboard, Financeiro, Operacional, Tráfego Pago, Contingência, Configurações), autenticação multi-role e tema personalizável.
+Substituir a página placeholder `/contingencia` por uma central completa com 7 abas. **Tabelas minimalistas (só nome + status + ação)**; todos os campos detalhados aparecem apenas no Sheet lateral de criar/editar/visualizar.
 
-## Observações de stack
+### Estrutura de rotas
 
-O template atual é **TanStack Start + Lovable Cloud (Supabase gerenciado)**, não React Router + Supabase puro como pedido no prompt. Vou adaptar mantendo a experiência idêntica:
+`src/routes/_authenticated/contingencia.tsx` vira **layout** com `<Outlet />` + tab nav horizontal sticky. Sub-rotas:
 
-- Roteamento: TanStack Router (file-based em `src/routes/`) no lugar de React Router. Type-safe, mesmo resultado visual.
-- Backend: Lovable Cloud (Supabase por baixo) — habilitarei na primeira fase.
-- Demais libs do prompt (Tailwind, shadcn/ui, Recharts, TanStack Query, date-fns, @dnd-kit) entram normalmente.
+```
+/contingencia/perfis           → facebook_profiles
+/contingencia/bms              → business_managers
+/contingencia/contas-anuncio   → ad_accounts
+/contingencia/paginas          → facebook_pages
+/contingencia/pixels           → pixels
+/contingencia/proxies          → proxies
+/contingencia/tiktok           → tiktok_assets (sub-tabs por asset_type)
+```
 
-## Fases de entrega
+`/contingencia` (index) redireciona para `/contingencia/perfis`.
 
-Dada a dimensão (16 seções, ~15 tabelas, 25+ rotas, Central de Contingência com 7 abas complexas), vou entregar em **fases incrementais**. Cada fase fica funcional antes de seguir.
+### Layout profissional
 
-### Fase 1 — Fundação
-- Habilitar Lovable Cloud
-- Design system completo em `src/styles.css` (dark, tokens oklch, 7 cores de tema via CSS vars dinâmicas)
-- Schema do banco (todas as 15 tabelas + RLS + seed automático no primeiro login via trigger)
-- Tabela `user_roles` separada (dono/admin/gestor_trafego/financeiro/operacional) com função `has_role`
-- Auth: `/login`, `/register`, `/reset-password`, `/onboarding`
-- Layout base: sidebar recolhível (220px ↔ 56px), header de página, proteção de rotas por role
-- Provider de tema (aplica `--primary` dinâmico salvo no perfil)
+```text
+┌─────────────────────────────────────────────────────────────┐
+│ PageHeader  [busca] [filtro status] [+ Novo]                │
+├─────────────────────────────────────────────────────────────┤
+│ KPI strip: 3-4 cards compactos (total, ativos, alertas)     │
+├──────────────────┬──────────────────────────────────────────┤
+│ Lista enxuta     │ Sheet lateral (drawer direito w-[480px]) │
+│ • Nome           │  - todos os campos do registro           │
+│ • Status badge   │  - credenciais mascaradas com 👁 toggle  │
+│ • [⋯ ações]      │  - botões: salvar / excluir              │
+└──────────────────┴──────────────────────────────────────────┘
+```
 
-### Fase 2 — Dashboard + Financeiro completo
-- `/dashboard` (6 KPIs, 2 gráficos, 2 listas)
-- Visão Geral, Lançamentos (CRUD + filtros + modal sync Conta Simples placeholder), Contas Bancárias, Fluxo de Caixa, Relatórios (com export CSV)
+- **Tabela** (shadcn Table) com **apenas 3 colunas**: Nome, Status, Ações. Linha inteira clicável → abre o Sheet de detalhes.
+- Sheet (`Sheet` shadcn, lado direito) é o **único lugar** onde aparecem todos os campos (IDs, vínculos, credenciais, observações).
+- Mesmo Sheet serve para "Novo" (vazio) e "Editar" (preenchido).
+- Em `xl+` o Sheet fica fixo lado-a-lado quando há item selecionado; em telas menores vira overlay.
 
-### Fase 3 — Operacional + Tráfego Pago
-- Kanban com `@dnd-kit/core`, lista de quadros, Minhas Tarefas
-- Campanhas (CRUD + KPIs), Performance, Análise de Criativos, Planejamento de Mídia
+### Componentes compartilhados
 
-### Fase 4 — Central de Contingência (7 abas)
-- Guard de acesso (apenas dono/admin)
-- Perfis, BMs, Contas de Anúncio, Páginas, Pixels, Proxies, TikTok (3 sub-seções)
-- Senhas sempre mascaradas com toggle olho, log em `contingency_logs`, confirmação de delete
+```
+src/components/contingencia/
+  ContingenciaTabs.tsx   — nav horizontal sticky com 7 tabs
+  SecretField.tsx        — input mascarado + olho + copiar (re-mascara em 10s; loga view)
+  StatusBadge.tsx        — badge colorido por status
+  EntitySheet.tsx        — wrapper genérico do Sheet (título, footer salvar/excluir)
+  DeleteConfirm.tsx      — AlertDialog confirmação digitando o nome
+src/lib/contingencia-log.ts — helper logAction(action, entity, entity_id)
+```
 
-### Fase 5 — Notificações + Configurações + Perfil
-- PWA install prompt, Web Push API, preferências, histórico
-- Configurações: Empresa, Usuários (com convite), Integrações (5 abas com modais Meta/TikTok)
-- `/perfil`: 2FA toggle, troca senha, cursor personalizado, seletor de cor do tema (7 opções)
+### Segurança e auditoria
 
-## Detalhes técnicos importantes
+- Layout `contingencia.tsx` redireciona para `/dashboard` se `!isAdminOrOwner()` (RLS já bloqueia também).
+- Toda revelação de senha, criar, editar, excluir grava em `contingency_logs`.
+- Senhas mascaradas por padrão; toggle olho com auto re-mascarar em 10s.
+- Delete sempre via `DeleteConfirm`.
 
-- **Senhas da Contingência**: armazenadas no Postgres com criptografia via `pgcrypto` (não em texto plano). Decriptação só via RPC server-side autorizada por role.
-- **Sincronização Conta Simples**: bloqueada por CORS no browser — entregarei o modal funcional com aviso "disponível via integração server-side" conforme prompt.
-- **Web Push real**: requer service worker + VAPID keys; entregarei UI + permissão do browser na Fase 5; push server-side fica como gancho documentado.
-- **Multi-tenant**: prompt usa `user_id` direto em todas as tabelas (cada usuário vê seus próprios dados). Mantenho assim — RLS por `auth.uid()`.
-- **Onboarding**: cria `company_settings`, contas, categorias e board "Geral" via seed automático.
+### Conteúdo de cada Sheet (campos completos)
 
-## Confirmação antes de começar
+1. **Perfis** — nome, status, cargo, email/senha FB, email/senha do email, token, 2FA + seed, data nasc, IG, proxy, anotações.
+2. **BMs** — nome, ID, tipo, perfil dono, BM administradora, link acesso, pixel compartilhado, observações.
+3. **Contas de anúncio** — nome, ID, BM mãe, perfil, tipo/bandeira/últimos 4 do cartão, limites, observações.
+4. **Páginas** — nome, ID, URL, BM acesso, perfil admin, IG, nível acesso, tipo vinculação.
+5. **Pixels** — nome, ID, BM dono, domínios, multi-select contas/BMs com acesso.
+6. **Proxies** — nome/ID, IP:porta, tipo, cidade/país, provedor, vencimento, credenciais auth, perfil vinculado.
+7. **TikTok** — sub-tabs (BCs / Anunciantes / Perfis) filtrando `asset_type`. Campos por tipo.
 
-Esse escopo é grande (~50+ telas). Posso começar pela **Fase 1** agora e seguir incrementando, mostrando progresso ao final de cada fase. Confirma essa abordagem em fases?
+### Banco de dados
+
+Sem novas tabelas — todas existem. Sem migration necessária.
+
+### Arquivos a criar
+
+```
+src/routes/_authenticated/contingencia.tsx              (layout + tabs)
+src/routes/_authenticated/contingencia/index.tsx        (redirect → perfis)
+src/routes/_authenticated/contingencia/perfis.tsx
+src/routes/_authenticated/contingencia/bms.tsx
+src/routes/_authenticated/contingencia/contas-anuncio.tsx
+src/routes/_authenticated/contingencia/paginas.tsx
+src/routes/_authenticated/contingencia/pixels.tsx
+src/routes/_authenticated/contingencia/proxies.tsx
+src/routes/_authenticated/contingencia/tiktok.tsx
+src/components/contingencia/*.tsx
+src/lib/contingencia-log.ts
+```
+
+### Fora do escopo
+
+- Criptografia pgcrypto (fica para fase própria).
+- Importação CSV em massa.
