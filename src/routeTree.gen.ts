@@ -19,6 +19,7 @@ import { Route as AuthenticatedPerfilRouteImport } from './routes/_authenticated
 import { Route as AuthenticatedNotificacoesRouteImport } from './routes/_authenticated/notificacoes'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedContingenciaRouteImport } from './routes/_authenticated/contingencia'
+import { Route as AuthenticatedContingenciaIndexRouteImport } from './routes/_authenticated/contingencia/index'
 import { Route as AuthenticatedTrafegoPlanejamentoRouteImport } from './routes/_authenticated/trafego/planejamento'
 import { Route as AuthenticatedTrafegoPerformanceRouteImport } from './routes/_authenticated/trafego/performance'
 import { Route as AuthenticatedTrafegoCriativosRouteImport } from './routes/_authenticated/trafego/criativos'
@@ -84,6 +85,12 @@ const AuthenticatedContingenciaRoute =
     id: '/contingencia',
     path: '/contingencia',
     getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedContingenciaIndexRoute =
+  AuthenticatedContingenciaIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedContingenciaRoute,
   } as any)
 const AuthenticatedTrafegoPlanejamentoRoute =
   AuthenticatedTrafegoPlanejamentoRouteImport.update({
@@ -176,7 +183,7 @@ export interface FileRoutesByFullPath {
   '/onboarding': typeof OnboardingRoute
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
-  '/contingencia': typeof AuthenticatedContingenciaRoute
+  '/contingencia': typeof AuthenticatedContingenciaRouteWithChildren
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/notificacoes': typeof AuthenticatedNotificacoesRoute
   '/perfil': typeof AuthenticatedPerfilRoute
@@ -194,6 +201,7 @@ export interface FileRoutesByFullPath {
   '/trafego/criativos': typeof AuthenticatedTrafegoCriativosRoute
   '/trafego/performance': typeof AuthenticatedTrafegoPerformanceRoute
   '/trafego/planejamento': typeof AuthenticatedTrafegoPlanejamentoRoute
+  '/contingencia/': typeof AuthenticatedContingenciaIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -201,7 +209,6 @@ export interface FileRoutesByTo {
   '/onboarding': typeof OnboardingRoute
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
-  '/contingencia': typeof AuthenticatedContingenciaRoute
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/notificacoes': typeof AuthenticatedNotificacoesRoute
   '/perfil': typeof AuthenticatedPerfilRoute
@@ -219,6 +226,7 @@ export interface FileRoutesByTo {
   '/trafego/criativos': typeof AuthenticatedTrafegoCriativosRoute
   '/trafego/performance': typeof AuthenticatedTrafegoPerformanceRoute
   '/trafego/planejamento': typeof AuthenticatedTrafegoPlanejamentoRoute
+  '/contingencia': typeof AuthenticatedContingenciaIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -228,7 +236,7 @@ export interface FileRoutesById {
   '/onboarding': typeof OnboardingRoute
   '/register': typeof RegisterRoute
   '/reset-password': typeof ResetPasswordRoute
-  '/_authenticated/contingencia': typeof AuthenticatedContingenciaRoute
+  '/_authenticated/contingencia': typeof AuthenticatedContingenciaRouteWithChildren
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/notificacoes': typeof AuthenticatedNotificacoesRoute
   '/_authenticated/perfil': typeof AuthenticatedPerfilRoute
@@ -246,6 +254,7 @@ export interface FileRoutesById {
   '/_authenticated/trafego/criativos': typeof AuthenticatedTrafegoCriativosRoute
   '/_authenticated/trafego/performance': typeof AuthenticatedTrafegoPerformanceRoute
   '/_authenticated/trafego/planejamento': typeof AuthenticatedTrafegoPlanejamentoRoute
+  '/_authenticated/contingencia/': typeof AuthenticatedContingenciaIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -273,6 +282,7 @@ export interface FileRouteTypes {
     | '/trafego/criativos'
     | '/trafego/performance'
     | '/trafego/planejamento'
+    | '/contingencia/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -280,7 +290,6 @@ export interface FileRouteTypes {
     | '/onboarding'
     | '/register'
     | '/reset-password'
-    | '/contingencia'
     | '/dashboard'
     | '/notificacoes'
     | '/perfil'
@@ -298,6 +307,7 @@ export interface FileRouteTypes {
     | '/trafego/criativos'
     | '/trafego/performance'
     | '/trafego/planejamento'
+    | '/contingencia'
   id:
     | '__root__'
     | '/'
@@ -324,6 +334,7 @@ export interface FileRouteTypes {
     | '/_authenticated/trafego/criativos'
     | '/_authenticated/trafego/performance'
     | '/_authenticated/trafego/planejamento'
+    | '/_authenticated/contingencia/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -406,6 +417,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/contingencia'
       preLoaderRoute: typeof AuthenticatedContingenciaRouteImport
       parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/contingencia/': {
+      id: '/_authenticated/contingencia/'
+      path: '/'
+      fullPath: '/contingencia/'
+      preLoaderRoute: typeof AuthenticatedContingenciaIndexRouteImport
+      parentRoute: typeof AuthenticatedContingenciaRoute
     }
     '/_authenticated/trafego/planejamento': {
       id: '/_authenticated/trafego/planejamento'
@@ -508,8 +526,22 @@ declare module '@tanstack/react-router' {
   }
 }
 
+interface AuthenticatedContingenciaRouteChildren {
+  AuthenticatedContingenciaIndexRoute: typeof AuthenticatedContingenciaIndexRoute
+}
+
+const AuthenticatedContingenciaRouteChildren: AuthenticatedContingenciaRouteChildren =
+  {
+    AuthenticatedContingenciaIndexRoute: AuthenticatedContingenciaIndexRoute,
+  }
+
+const AuthenticatedContingenciaRouteWithChildren =
+  AuthenticatedContingenciaRoute._addFileChildren(
+    AuthenticatedContingenciaRouteChildren,
+  )
+
 interface AuthenticatedRouteChildren {
-  AuthenticatedContingenciaRoute: typeof AuthenticatedContingenciaRoute
+  AuthenticatedContingenciaRoute: typeof AuthenticatedContingenciaRouteWithChildren
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedNotificacoesRoute: typeof AuthenticatedNotificacoesRoute
   AuthenticatedPerfilRoute: typeof AuthenticatedPerfilRoute
@@ -530,7 +562,7 @@ interface AuthenticatedRouteChildren {
 }
 
 const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
-  AuthenticatedContingenciaRoute: AuthenticatedContingenciaRoute,
+  AuthenticatedContingenciaRoute: AuthenticatedContingenciaRouteWithChildren,
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedNotificacoesRoute: AuthenticatedNotificacoesRoute,
   AuthenticatedPerfilRoute: AuthenticatedPerfilRoute,
