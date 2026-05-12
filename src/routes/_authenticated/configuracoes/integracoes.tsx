@@ -43,7 +43,7 @@ function Page() {
   }
   async function loadLogs() {
     try {
-      const data = await csLogFn({ data: { limit: 5 } });
+      const data = await csLogFn();
       setLogs((data ?? []) as SyncLog[]);
     } catch { /* noop */ }
   }
