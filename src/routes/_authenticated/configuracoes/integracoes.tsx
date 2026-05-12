@@ -1,4 +1,5 @@
-import { createFileRoute, useServerFn } from "@tanstack/react-router";
+import { createFileRoute } from "@tanstack/react-router";
+import { useServerFn } from "@tanstack/react-start";
 import { useEffect, useState } from "react";
 import { PageHeader } from "@/components/layout/PageHeader";
 import { supabase } from "@/integrations/supabase/client";
@@ -17,7 +18,7 @@ import { ptBR } from "date-fns/locale";
 
 export const Route = createFileRoute("/_authenticated/configuracoes/integracoes")({ component: Page });
 
-type Webhook = { id: string; name: string; url: string; event: string; method: string; status: string; created_at: string };
+type WebhookRow = { id: string; name: string; url: string; event: string; method: string; status: string; created_at: string };
 type SyncLog = { id: string; status: string; imported: number | null; message: string | null; ran_at: string };
 
 const EVENTS = ["nova_venda", "campanha_pausada", "alerta_roas", "transacao_criada", "tarefa_concluida"];
@@ -33,12 +34,12 @@ function Page() {
   const [syncing, setSyncing] = useState(false);
   const [logs, setLogs] = useState<SyncLog[]>([]);
 
-  const [hooks, setHooks] = useState<Webhook[]>([]);
+  const [hooks, setHooks] = useState<WebhookRow[]>([]);
   const [newHook, setNewHook] = useState({ name: "", url: "", event: EVENTS[0], method: "POST" });
 
   async function loadHooks() {
     const { data } = await supabase.from("webhooks").select("*").order("created_at", { ascending: false });
-    setHooks((data ?? []) as Webhook[]);
+    setHooks((data ?? []) as WebhookRow[]);
   }
   async function loadLogs() {
     try {
