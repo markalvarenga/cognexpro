@@ -98,7 +98,8 @@ function Page() {
     if (!user || !prefs) return;
     const next = { ...prefs, [key]: value };
     setPrefs(next);
-    await supabase.from("notification_preferences").update({ [key]: value }).eq("user_id", user.id);
+    const patch = { [key]: value } as Partial<Prefs>;
+    await supabase.from("notification_preferences").update(patch).eq("user_id", user.id);
   }
 
   async function seedDemo() {
