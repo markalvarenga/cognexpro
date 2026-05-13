@@ -37,13 +37,13 @@ function getKey(): string {
 
 async function ensureOwnership(entity: string, id: string, userId: string) {
   const { data, error } = await supabaseAdmin
-    .from(entity)
+    .from(entity as never)
     .select("user_id")
     .eq("id", id)
     .maybeSingle();
   if (error) throw error;
   if (!data) throw new Error("Registro não encontrado");
-  if ((data as { user_id: string }).user_id !== userId) {
+  if ((data as unknown as { user_id: string }).user_id !== userId) {
     throw new Error("Sem permissão para este registro");
   }
 }
@@ -79,12 +79,12 @@ export const revealSecret = createServerFn({ method: "POST" })
     await ensureOwnership(data.entity, data.id, userId);
 
     const { data: row, error } = await supabaseAdmin
-      .from(data.entity)
+      .from(data.entity as never)
       .select(encCol)
       .eq("id", data.id)
       .maybeSingle();
     if (error) throw error;
-    const cipher = row ? (row as Record<string, unknown>)[encCol] : null;
+    const cipher = row ? (row as unknown as Record<string, unknown>)[encCol] : null;
     if (cipher == null) {
       return { value: "" };
     }
@@ -131,8 +131,8 @@ export const saveSecret = createServerFn({ method: "POST" })
     }
 
     const { error } = await supabaseAdmin
-      .from(data.entity)
-      .update({ [encCol]: cipher })
+      .from(data.entity as never)
+      .update({ [encCol]: cipher } as never)
       .eq("id", data.id);
     if (error) throw error;
 
@@ -162,14 +162,14 @@ export const listSecretFlags = createServerFn({ method: "POST" })
     await ensureOwnership(data.entity, data.id, userId);
     const cols = Object.values(map);
     const { data: row, error } = await supabaseAdmin
-      .from(data.entity)
+      .from(data.entity as never)
       .select(cols.join(","))
       .eq("id", data.id)
       .maybeSingle();
     if (error) throw error;
     const flags: Record<string, boolean> = {};
     for (const [field, col] of Object.entries(map)) {
-      flags[field] = !!(row && (row as Record<string, unknown>)[col]);
+      flags[field] = !!(row && (row as unknown as Record<string, unknown>)[col]);
     }
     return { flags };
   });
