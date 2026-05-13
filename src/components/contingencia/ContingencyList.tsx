@@ -17,6 +17,8 @@ import { StatusBadge } from "./StatusBadge";
 import { SecretField } from "./SecretField";
 import { DeleteConfirm } from "./DeleteConfirm";
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
+import { useServerFn } from "@tanstack/react-start";
+import { saveSecret, listSecretFlags } from "@/lib/contingencia-secrets.functions";
 
 export type FieldDef = {
   key: string;
@@ -59,6 +61,9 @@ export function ContingencyList(props: ContingencyListProps) {
   const [draft, setDraft] = useState<Record<string, unknown>>({});
   const [open, setOpen] = useState(false);
   const [deleteOpen, setDeleteOpen] = useState(false);
+  const [secretFlags, setSecretFlags] = useState<Record<string, boolean>>({});
+  const saveSecretFn = useServerFn(saveSecret);
+  const listFlagsFn = useServerFn(listSecretFlags);
 
   const queryKey = ["cont", table, baseFilter];
 
@@ -90,24 +95,52 @@ export function ContingencyList(props: ContingencyListProps) {
     return { total, ativos, alertas };
   }, [rows, statusField]);
 
+  const secretFields = useMemo(() => fields.filter((f) => f.type === "secret"), [fields]);
+
   const openNew = () => {
     setSelected(null);
     setDraft({ ...(defaults ?? {}), ...(baseFilter ?? {}) });
+    setSecretFlags({});
     setOpen(true);
   };
 
-  const openEdit = (r: Row) => {
+  const openEdit = async (r: Row) => {
     setSelected(r);
-    setDraft({ ...r });
+    // Strip any *_enc bytea blobs that came from select(*)
+    const cleaned: Record<string, unknown> = {};
+    for (const [k, v] of Object.entries(r)) {
+      if (k.endsWith("_enc")) continue;
+      cleaned[k] = v;
+    }
+    // Clear secret fields so user has to reveal explicitly
+    for (const f of secretFields) cleaned[f.key] = "";
+    setDraft(cleaned);
+    setSecretFlags({});
     setOpen(true);
+    if (secretFields.length > 0) {
+      try {
+        const { flags } = await listFlagsFn({ data: { entity, id: r.id } });
+        setSecretFlags(flags);
+      } catch {
+        // silently — user just won't see the placeholder
+      }
+    }
   };
 
   const saveMut = useMutation({
     mutationFn: async (payload: Record<string, unknown>) => {
       if (!user) throw new Error("not authed");
       const clean: Record<string, unknown> = { ...payload };
+      // Extract secrets and remove from main payload (handled separately)
+      const secrets: Record<string, string> = {};
+      for (const f of secretFields) {
+        const v = clean[f.key];
+        if (typeof v === "string" && v.length > 0) secrets[f.key] = v;
+        delete clean[f.key];
+      }
       // strip id when inserting
       const isUpdate = !!selected;
+      let rowId: string;
       if (!isUpdate) {
         delete clean.id;
         delete clean.created_at;
@@ -123,11 +156,18 @@ export function ContingencyList(props: ContingencyListProps) {
       if (isUpdate) {
         const { error } = await supabase.from(table as never).update(clean as never).eq("id", selected!.id);
         if (error) throw error;
+        rowId = selected!.id;
         await logAction("update", entity, selected!.id);
       } else {
         const { data, error } = await supabase.from(table as never).insert(clean as never).select("id").single();
         if (error) throw error;
-        await logAction("create", entity, (data as { id: string } | null)?.id);
+        rowId = (data as { id: string } | null)?.id ?? "";
+        await logAction("create", entity, rowId);
+      }
+      // Persist secrets via server fn (encrypts server-side)
+      for (const [field, value] of Object.entries(secrets)) {
+        if (!rowId) break;
+        await saveSecretFn({ data: { entity, id: rowId, field, value } });
       }
     },
     onSuccess: () => {
@@ -279,11 +319,13 @@ export function ContingencyList(props: ContingencyListProps) {
                       <SecretField
                         key={f.key}
                         label={f.label}
+                        field={f.key}
                         value={String(v ?? "")}
                         onChange={setV}
                         entity={entity}
                         entityId={selected?.id}
                         placeholder={f.placeholder}
+                        hasStored={!!secretFlags[f.key]}
                       />
                     );
                   }
