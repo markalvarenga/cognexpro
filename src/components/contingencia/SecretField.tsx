@@ -9,6 +9,7 @@ import { revealSecret } from "@/lib/contingencia-secrets.functions";
 
 export function SecretField({
   label,
+  field,
   value,
   onChange,
   entity,
@@ -17,6 +18,8 @@ export function SecretField({
   hasStored,
 }: {
   label: string;
+  /** Logical field name registered in SECRET_REGISTRY (e.g. "senha_facebook") */
+  field: string;
   value: string;
   onChange: (v: string) => void;
   entity: string;
@@ -65,7 +68,7 @@ export function SecretField({
     // Need to fetch from server
     setLoading(true);
     try {
-      const { value: plain } = await reveal({ data: { entity, id: entityId, field: label.toLowerCase().includes("placeholder") ? "" : "" } });
+      const { value: plain } = await reveal({ data: { entity, id: entityId, field } });
       onChange(plain);
       setRevealed(true);
       setVisible(true);
@@ -80,7 +83,7 @@ export function SecretField({
     if (!value && hasStored && entityId) {
       // Reveal-and-copy in one click
       try {
-        const { value: plain } = await reveal({ data: { entity, id: entityId, field: "" } });
+        const { value: plain } = await reveal({ data: { entity, id: entityId, field } });
         await navigator.clipboard.writeText(plain ?? "");
       } catch (e) {
         toast.error((e as Error).message);
