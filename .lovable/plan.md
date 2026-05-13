@@ -1,93 +1,86 @@
-## Fase 4 — Central de Contingência (layout profissional, tabelas enxutas)
+## Fase 6 — Hardening de Segurança (crítico)
 
-Substituir a página placeholder `/contingencia` por uma central completa com 7 abas. **Tabelas minimalistas (só nome + status + ação)**; todos os campos detalhados aparecem apenas no Sheet lateral de criar/editar/visualizar.
+O scanner detectou **6 findings de severidade ERROR** que invalidam todo o controle de acesso da Central de Contingência. Antes de seguir construindo, precisamos fechar esses buracos.
 
-### Estrutura de rotas
+### Problemas atuais
 
-`src/routes/_authenticated/contingencia.tsx` vira **layout** com `<Outlet />` + tab nav horizontal sticky. Sub-rotas:
+1. **Escalação de privilégio** — o trigger `handle_new_user()` dá `role = 'dono'` para **todo** usuário novo. Resultado: `is_admin_or_owner()` retorna `true` para qualquer pessoa logada, e as RLS de `facebook_profiles`, `business_managers`, `ad_accounts`, `facebook_pages`, `pixels`, `tiktok_assets`, `proxies` e `contingency_logs` **não protegem nada**.
+2. **Credenciais em texto puro** — `senha_facebook`, `senha_email`, `token_facebook`, `seed_2fa` (perfis), `senha`/`seed_2fa` (TikTok), `usuario_auth`/`senha_auth` (proxies) estão salvos sem criptografia.
+3. **`user_roles` sem políticas explícitas de write** — funciona por default-deny, mas não está auditável.
 
-```
-/contingencia/perfis           → facebook_profiles
-/contingencia/bms              → business_managers
-/contingencia/contas-anuncio   → ad_accounts
-/contingencia/paginas          → facebook_pages
-/contingencia/pixels           → pixels
-/contingencia/proxies          → proxies
-/contingencia/tiktok           → tiktok_assets (sub-tabs por asset_type)
-```
+### O que vamos fazer
 
-`/contingencia` (index) redireciona para `/contingencia/perfis`.
+#### 6.1 — Corrigir o trigger e o modelo de roles (migration)
 
-### Layout profissional
+- Trigger `handle_new_user()` passa a inserir `role = 'operacional'` (least privilege). O **primeiro usuário do sistema** continua ganhando `dono` automaticamente (detecção via `COUNT(*) = 0` em `user_roles`).
+- Adicionar políticas explícitas em `user_roles`:
+  - `INSERT/UPDATE/DELETE`: somente `service_role` (usuários comuns bloqueados de forma explícita).
+  - `SELECT` continua `auth.uid() = user_id`.
+- Função `promote_user(target_user_id, new_role)` `SECURITY DEFINER` chamada apenas via server function de admin.
+- **Sem rebaixar usuários existentes automaticamente** — apenas novos cadastros ficam restritos. O dono atual decide manualmente quem mantém `dono/admin`.
 
-```text
-┌─────────────────────────────────────────────────────────────┐
-│ PageHeader  [busca] [filtro status] [+ Novo]                │
-├─────────────────────────────────────────────────────────────┤
-│ KPI strip: 3-4 cards compactos (total, ativos, alertas)     │
-├──────────────────┬──────────────────────────────────────────┤
-│ Lista enxuta     │ Sheet lateral (drawer direito w-[480px]) │
-│ • Nome           │  - todos os campos do registro           │
-│ • Status badge   │  - credenciais mascaradas com 👁 toggle  │
-│ • [⋯ ações]      │  - botões: salvar / excluir              │
-└──────────────────┴──────────────────────────────────────────┘
-```
+#### 6.2 — Criptografar credenciais com pgcrypto
 
-- **Tabela** (shadcn Table) com **apenas 3 colunas**: Nome, Status, Ações. Linha inteira clicável → abre o Sheet de detalhes.
-- Sheet (`Sheet` shadcn, lado direito) é o **único lugar** onde aparecem todos os campos (IDs, vínculos, credenciais, observações).
-- Mesmo Sheet serve para "Novo" (vazio) e "Editar" (preenchido).
-- Em `xl+` o Sheet fica fixo lado-a-lado quando há item selecionado; em telas menores vira overlay.
+- Habilitar extensão `pgcrypto`.
+- Criar segredo `APP_ENCRYPTION_KEY` (32 bytes) e função `app.get_encryption_key()` lendo de `vault` (ou GUC server-side).
+- Funções helper:
+  - `encrypt_secret(plaintext text) returns bytea` — usa `pgp_sym_encrypt`.
+  - `decrypt_secret(ciphertext bytea) returns text` — usa `pgp_sym_decrypt`.
+- Adicionar colunas `*_encrypted bytea` paralelas às atuais em:
+  - `facebook_profiles`: `senha_facebook`, `senha_email`, `token_facebook`, `seed_2fa`
+  - `tiktok_assets`: `senha`, `seed_2fa`
+  - `proxies`: `senha_auth`
+- Migrar dados existentes (cifrar valores atuais) e **dropar as colunas em texto puro**.
+- Criar **view** `facebook_profiles_safe`, `tiktok_assets_safe`, `proxies_safe` que devolve as colunas comuns + `has_<segredo> boolean` (nunca o texto). Listagens passam a usar a view.
 
-### Componentes compartilhados
+#### 6.3 — Server functions para revelar/gravar segredos
+
+Toda leitura/gravação de segredo passa por `createServerFn` com `requireSupabaseAuth` + checagem `is_admin_or_owner`:
 
 ```
-src/components/contingencia/
-  ContingenciaTabs.tsx   — nav horizontal sticky com 7 tabs
-  SecretField.tsx        — input mascarado + olho + copiar (re-mascara em 10s; loga view)
-  StatusBadge.tsx        — badge colorido por status
-  EntitySheet.tsx        — wrapper genérico do Sheet (título, footer salvar/excluir)
-  DeleteConfirm.tsx      — AlertDialog confirmação digitando o nome
-src/lib/contingencia-log.ts — helper logAction(action, entity, entity_id)
+src/lib/contingencia-secrets.functions.ts
+  - revealSecret({ entity, id, field })  → retorna texto descriptografado + grava view_secret no log
+  - saveSecret({ entity, id, field, value }) → cifra e grava + log
 ```
 
-### Segurança e auditoria
+Componente `SecretField` deixa de ler direto do Supabase: chama `revealSecret` quando o usuário clica no olho.
 
-- Layout `contingencia.tsx` redireciona para `/dashboard` se `!isAdminOrOwner()` (RLS já bloqueia também).
-- Toda revelação de senha, criar, editar, excluir grava em `contingency_logs`.
-- Senhas mascaradas por padrão; toggle olho com auto re-mascarar em 10s.
-- Delete sempre via `DeleteConfirm`.
+#### 6.4 — UI: tela de gerenciar roles (Configurações > Usuários)
 
-### Conteúdo de cada Sheet (campos completos)
-
-1. **Perfis** — nome, status, cargo, email/senha FB, email/senha do email, token, 2FA + seed, data nasc, IG, proxy, anotações.
-2. **BMs** — nome, ID, tipo, perfil dono, BM administradora, link acesso, pixel compartilhado, observações.
-3. **Contas de anúncio** — nome, ID, BM mãe, perfil, tipo/bandeira/últimos 4 do cartão, limites, observações.
-4. **Páginas** — nome, ID, URL, BM acesso, perfil admin, IG, nível acesso, tipo vinculação.
-5. **Pixels** — nome, ID, BM dono, domínios, multi-select contas/BMs com acesso.
-6. **Proxies** — nome/ID, IP:porta, tipo, cidade/país, provedor, vencimento, credenciais auth, perfil vinculado.
-7. **TikTok** — sub-tabs (BCs / Anunciantes / Perfis) filtrando `asset_type`. Campos por tipo.
+A tela já existe, mas hoje só lista. Adicionar:
+- Select de role inline (dono/admin/gestor_trafego/financeiro/operacional) — visível só para `dono`.
+- Botão "Promover/Rebaixar" chama nova server function `setUserRole({ user_id, role })` (admin-only via service role).
+- Aviso visual quando há mais de um `dono` listado.
 
 ### Banco de dados
 
-Sem novas tabelas — todas existem. Sem migration necessária.
+Migration única cobrindo:
+1. `CREATE EXTENSION IF NOT EXISTS pgcrypto`
+2. Recriar `handle_new_user()` com lógica do "primeiro usuário"
+3. Políticas explícitas em `user_roles` (deny insert/update/delete para `authenticated`)
+4. Funções `encrypt_secret` / `decrypt_secret`
+5. Colunas `*_encrypted` + backfill + drop das colunas plaintext
+6. Views `*_safe`
+7. Função `set_user_role(target uuid, new_role app_role)` SECURITY DEFINER
 
-### Arquivos a criar
+### Arquivos a criar/editar
 
 ```
-src/routes/_authenticated/contingencia.tsx              (layout + tabs)
-src/routes/_authenticated/contingencia/index.tsx        (redirect → perfis)
-src/routes/_authenticated/contingencia/perfis.tsx
-src/routes/_authenticated/contingencia/bms.tsx
-src/routes/_authenticated/contingencia/contas-anuncio.tsx
-src/routes/_authenticated/contingencia/paginas.tsx
-src/routes/_authenticated/contingencia/pixels.tsx
-src/routes/_authenticated/contingencia/proxies.tsx
-src/routes/_authenticated/contingencia/tiktok.tsx
-src/components/contingencia/*.tsx
-src/lib/contingencia-log.ts
+supabase/migrations/<timestamp>_security_hardening.sql   (nova)
+src/lib/contingencia-secrets.functions.ts                (nova)
+src/lib/admin-roles.functions.ts                         (nova)
+src/components/contingencia/SecretField.tsx              (refatorar — usar revealSecret)
+src/components/contingencia/ContingencyList.tsx          (usar views *_safe)
+src/routes/_authenticated/configuracoes/usuarios.tsx     (adicionar UI de role)
 ```
 
 ### Fora do escopo
 
-- Criptografia pgcrypto (fica para fase própria).
-- Importação CSV em massa.
+- Rotação automática de chave de criptografia (envelope encryption).
+- Audit log assinado / append-only WORM.
+- 2FA real para usuários do app (não confundir com 2FA dos perfis FB).
+
+### Risco / impacto
+
+- **Migration destrutiva**: as colunas plaintext serão removidas após backfill. Dados ficam preservados, mas só acessíveis via `revealSecret`.
+- Usuários atualmente com `dono` continuam com `dono` — só novos cadastros são afetados.

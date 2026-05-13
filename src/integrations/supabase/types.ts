@@ -533,12 +533,12 @@ export type Database = {
           instagram_usuario: string | null
           profile_name: string
           proxy_id: string | null
-          seed_2fa: string | null
-          senha_email: string | null
-          senha_facebook: string | null
+          seed_2fa_enc: string | null
+          senha_email_enc: string | null
+          senha_facebook_enc: string | null
           status: string | null
           tem_2fa: string | null
-          token_facebook: string | null
+          token_facebook_enc: string | null
           updated_at: string | null
           user_id: string
         }
@@ -557,12 +557,12 @@ export type Database = {
           instagram_usuario?: string | null
           profile_name: string
           proxy_id?: string | null
-          seed_2fa?: string | null
-          senha_email?: string | null
-          senha_facebook?: string | null
+          seed_2fa_enc?: string | null
+          senha_email_enc?: string | null
+          senha_facebook_enc?: string | null
           status?: string | null
           tem_2fa?: string | null
-          token_facebook?: string | null
+          token_facebook_enc?: string | null
           updated_at?: string | null
           user_id: string
         }
@@ -581,12 +581,12 @@ export type Database = {
           instagram_usuario?: string | null
           profile_name?: string
           proxy_id?: string | null
-          seed_2fa?: string | null
-          senha_email?: string | null
-          senha_facebook?: string | null
+          seed_2fa_enc?: string | null
+          senha_email_enc?: string | null
+          senha_facebook_enc?: string | null
           status?: string | null
           tem_2fa?: string | null
-          token_facebook?: string | null
+          token_facebook_enc?: string | null
           updated_at?: string | null
           user_id?: string
         }
@@ -722,7 +722,7 @@ export type Database = {
           observacoes: string | null
           perfil_id: string | null
           provedor: string | null
-          senha_auth: string | null
+          senha_auth_enc: string | null
           status: string | null
           tipo: string | null
           user_id: string
@@ -738,7 +738,7 @@ export type Database = {
           observacoes?: string | null
           perfil_id?: string | null
           provedor?: string | null
-          senha_auth?: string | null
+          senha_auth_enc?: string | null
           status?: string | null
           tipo?: string | null
           user_id: string
@@ -754,7 +754,7 @@ export type Database = {
           observacoes?: string | null
           perfil_id?: string | null
           provedor?: string | null
-          senha_auth?: string | null
+          senha_auth_enc?: string | null
           status?: string | null
           tipo?: string | null
           user_id?: string
@@ -842,8 +842,8 @@ export type Database = {
           nome: string
           observacoes: string | null
           proxy_id: string | null
-          seed_2fa: string | null
-          senha: string | null
+          seed_2fa_enc: string | null
+          senha_enc: string | null
           status: string | null
           tem_2fa: string | null
           tipo_cartao: string | null
@@ -867,8 +867,8 @@ export type Database = {
           nome: string
           observacoes?: string | null
           proxy_id?: string | null
-          seed_2fa?: string | null
-          senha?: string | null
+          seed_2fa_enc?: string | null
+          senha_enc?: string | null
           status?: string | null
           tem_2fa?: string | null
           tipo_cartao?: string | null
@@ -892,8 +892,8 @@ export type Database = {
           nome?: string
           observacoes?: string | null
           proxy_id?: string | null
-          seed_2fa?: string | null
-          senha?: string | null
+          seed_2fa_enc?: string | null
+          senha_enc?: string | null
           status?: string | null
           tem_2fa?: string | null
           tipo_cartao?: string | null
@@ -1067,6 +1067,11 @@ export type Database = {
       [_ in never]: never
     }
     Functions: {
+      app_decrypt: {
+        Args: { ciphertext: string; key: string }
+        Returns: string
+      }
+      app_encrypt: { Args: { key: string; plaintext: string }; Returns: string }
       has_role: {
         Args: {
           _role: Database["public"]["Enums"]["app_role"]
@@ -1075,6 +1080,14 @@ export type Database = {
         Returns: boolean
       }
       is_admin_or_owner: { Args: { _user_id: string }; Returns: boolean }
+      set_user_role: {
+        Args: {
+          _actor: string
+          _new_role: Database["public"]["Enums"]["app_role"]
+          _target_user: string
+        }
+        Returns: undefined
+      }
     }
     Enums: {
       app_role:
