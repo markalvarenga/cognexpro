@@ -26,6 +26,7 @@ import { Route as AuthenticatedTrafegoPlanejamentoRouteImport } from './routes/_
 import { Route as AuthenticatedTrafegoPerformanceRouteImport } from './routes/_authenticated/trafego/performance'
 import { Route as AuthenticatedTrafegoCriativosRouteImport } from './routes/_authenticated/trafego/criativos'
 import { Route as AuthenticatedTrafegoCampanhasRouteImport } from './routes/_authenticated/trafego/campanhas'
+import { Route as AuthenticatedTiktokLaunchRouteImport } from './routes/_authenticated/tiktok/launch'
 import { Route as AuthenticatedOperacionalTarefasRouteImport } from './routes/_authenticated/operacional/tarefas'
 import { Route as AuthenticatedOperacionalKanbanRouteImport } from './routes/_authenticated/operacional/kanban'
 import { Route as AuthenticatedFinanceiroVisaoGeralRouteImport } from './routes/_authenticated/financeiro/visao-geral'
@@ -129,6 +130,12 @@ const AuthenticatedTrafegoCampanhasRoute =
     path: '/trafego/campanhas',
     getParentRoute: () => AuthenticatedRoute,
   } as any)
+const AuthenticatedTiktokLaunchRoute =
+  AuthenticatedTiktokLaunchRouteImport.update({
+    id: '/launch',
+    path: '/launch',
+    getParentRoute: () => AuthenticatedTiktokRoute,
+  } as any)
 const AuthenticatedOperacionalTarefasRoute =
   AuthenticatedOperacionalTarefasRouteImport.update({
     id: '/operacional/tarefas',
@@ -211,6 +218,7 @@ export interface FileRoutesByFullPath {
   '/financeiro/visao-geral': typeof AuthenticatedFinanceiroVisaoGeralRoute
   '/operacional/kanban': typeof AuthenticatedOperacionalKanbanRoute
   '/operacional/tarefas': typeof AuthenticatedOperacionalTarefasRoute
+  '/tiktok/launch': typeof AuthenticatedTiktokLaunchRoute
   '/trafego/campanhas': typeof AuthenticatedTrafegoCampanhasRoute
   '/trafego/criativos': typeof AuthenticatedTrafegoCriativosRoute
   '/trafego/performance': typeof AuthenticatedTrafegoPerformanceRoute
@@ -237,6 +245,7 @@ export interface FileRoutesByTo {
   '/financeiro/visao-geral': typeof AuthenticatedFinanceiroVisaoGeralRoute
   '/operacional/kanban': typeof AuthenticatedOperacionalKanbanRoute
   '/operacional/tarefas': typeof AuthenticatedOperacionalTarefasRoute
+  '/tiktok/launch': typeof AuthenticatedTiktokLaunchRoute
   '/trafego/campanhas': typeof AuthenticatedTrafegoCampanhasRoute
   '/trafego/criativos': typeof AuthenticatedTrafegoCriativosRoute
   '/trafego/performance': typeof AuthenticatedTrafegoPerformanceRoute
@@ -267,6 +276,7 @@ export interface FileRoutesById {
   '/_authenticated/financeiro/visao-geral': typeof AuthenticatedFinanceiroVisaoGeralRoute
   '/_authenticated/operacional/kanban': typeof AuthenticatedOperacionalKanbanRoute
   '/_authenticated/operacional/tarefas': typeof AuthenticatedOperacionalTarefasRoute
+  '/_authenticated/tiktok/launch': typeof AuthenticatedTiktokLaunchRoute
   '/_authenticated/trafego/campanhas': typeof AuthenticatedTrafegoCampanhasRoute
   '/_authenticated/trafego/criativos': typeof AuthenticatedTrafegoCriativosRoute
   '/_authenticated/trafego/performance': typeof AuthenticatedTrafegoPerformanceRoute
@@ -297,6 +307,7 @@ export interface FileRouteTypes {
     | '/financeiro/visao-geral'
     | '/operacional/kanban'
     | '/operacional/tarefas'
+    | '/tiktok/launch'
     | '/trafego/campanhas'
     | '/trafego/criativos'
     | '/trafego/performance'
@@ -323,6 +334,7 @@ export interface FileRouteTypes {
     | '/financeiro/visao-geral'
     | '/operacional/kanban'
     | '/operacional/tarefas'
+    | '/tiktok/launch'
     | '/trafego/campanhas'
     | '/trafego/criativos'
     | '/trafego/performance'
@@ -352,6 +364,7 @@ export interface FileRouteTypes {
     | '/_authenticated/financeiro/visao-geral'
     | '/_authenticated/operacional/kanban'
     | '/_authenticated/operacional/tarefas'
+    | '/_authenticated/tiktok/launch'
     | '/_authenticated/trafego/campanhas'
     | '/_authenticated/trafego/criativos'
     | '/_authenticated/trafego/performance'
@@ -490,6 +503,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AuthenticatedTrafegoCampanhasRouteImport
       parentRoute: typeof AuthenticatedRoute
     }
+    '/_authenticated/tiktok/launch': {
+      id: '/_authenticated/tiktok/launch'
+      path: '/launch'
+      fullPath: '/tiktok/launch'
+      preLoaderRoute: typeof AuthenticatedTiktokLaunchRouteImport
+      parentRoute: typeof AuthenticatedTiktokRoute
+    }
     '/_authenticated/operacional/tarefas': {
       id: '/_authenticated/operacional/tarefas'
       path: '/operacional/tarefas'
@@ -578,10 +598,12 @@ const AuthenticatedContingenciaRouteWithChildren =
   )
 
 interface AuthenticatedTiktokRouteChildren {
+  AuthenticatedTiktokLaunchRoute: typeof AuthenticatedTiktokLaunchRoute
   AuthenticatedTiktokIndexRoute: typeof AuthenticatedTiktokIndexRoute
 }
 
 const AuthenticatedTiktokRouteChildren: AuthenticatedTiktokRouteChildren = {
+  AuthenticatedTiktokLaunchRoute: AuthenticatedTiktokLaunchRoute,
   AuthenticatedTiktokIndexRoute: AuthenticatedTiktokIndexRoute,
 }
 
