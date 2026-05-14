@@ -16,9 +16,12 @@ export const getTikTokAuthUrl = createServerFn({ method: "GET" })
   .middleware([requireSupabaseAuth])
   .handler(async ({ context }) => {
     const appId = process.env.TIKTOK_APP_ID;
-    const redirect = process.env.TIKTOK_REDIRECT_URI;
+    const redirect =
+      process.env.TIKTOK_REDIRECT_URI ??
+      `${process.env.SUPABASE_URL}/functions/v1/tiktok-oauth-callback`;
     if (!appId) throw new Error("TIKTOK_APP_ID ausente");
-    if (!redirect) throw new Error("TIKTOK_REDIRECT_URI ausente");
+    if (!redirect || redirect.startsWith("undefined"))
+      throw new Error("TIKTOK_REDIRECT_URI / SUPABASE_URL ausente");
 
     const params = new URLSearchParams({
       app_id: appId,
