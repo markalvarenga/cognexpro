@@ -15,10 +15,12 @@ import { Route as OnboardingRouteImport } from './routes/onboarding'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as AuthenticatedRouteImport } from './routes/_authenticated'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as AuthenticatedTiktokRouteImport } from './routes/_authenticated/tiktok'
 import { Route as AuthenticatedPerfilRouteImport } from './routes/_authenticated/perfil'
 import { Route as AuthenticatedNotificacoesRouteImport } from './routes/_authenticated/notificacoes'
 import { Route as AuthenticatedDashboardRouteImport } from './routes/_authenticated/dashboard'
 import { Route as AuthenticatedContingenciaRouteImport } from './routes/_authenticated/contingencia'
+import { Route as AuthenticatedTiktokIndexRouteImport } from './routes/_authenticated/tiktok/index'
 import { Route as AuthenticatedContingenciaIndexRouteImport } from './routes/_authenticated/contingencia/index'
 import { Route as AuthenticatedTrafegoPlanejamentoRouteImport } from './routes/_authenticated/trafego/planejamento'
 import { Route as AuthenticatedTrafegoPerformanceRouteImport } from './routes/_authenticated/trafego/performance'
@@ -64,6 +66,11 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AuthenticatedTiktokRoute = AuthenticatedTiktokRouteImport.update({
+  id: '/tiktok',
+  path: '/tiktok',
+  getParentRoute: () => AuthenticatedRoute,
+} as any)
 const AuthenticatedPerfilRoute = AuthenticatedPerfilRouteImport.update({
   id: '/perfil',
   path: '/perfil',
@@ -85,6 +92,12 @@ const AuthenticatedContingenciaRoute =
     id: '/contingencia',
     path: '/contingencia',
     getParentRoute: () => AuthenticatedRoute,
+  } as any)
+const AuthenticatedTiktokIndexRoute =
+  AuthenticatedTiktokIndexRouteImport.update({
+    id: '/',
+    path: '/',
+    getParentRoute: () => AuthenticatedTiktokRoute,
   } as any)
 const AuthenticatedContingenciaIndexRoute =
   AuthenticatedContingenciaIndexRouteImport.update({
@@ -187,6 +200,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof AuthenticatedDashboardRoute
   '/notificacoes': typeof AuthenticatedNotificacoesRoute
   '/perfil': typeof AuthenticatedPerfilRoute
+  '/tiktok': typeof AuthenticatedTiktokRouteWithChildren
   '/configuracoes/empresa': typeof AuthenticatedConfiguracoesEmpresaRoute
   '/configuracoes/integracoes': typeof AuthenticatedConfiguracoesIntegracoesRoute
   '/configuracoes/usuarios': typeof AuthenticatedConfiguracoesUsuariosRoute
@@ -202,6 +216,7 @@ export interface FileRoutesByFullPath {
   '/trafego/performance': typeof AuthenticatedTrafegoPerformanceRoute
   '/trafego/planejamento': typeof AuthenticatedTrafegoPlanejamentoRoute
   '/contingencia/': typeof AuthenticatedContingenciaIndexRoute
+  '/tiktok/': typeof AuthenticatedTiktokIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
@@ -227,6 +242,7 @@ export interface FileRoutesByTo {
   '/trafego/performance': typeof AuthenticatedTrafegoPerformanceRoute
   '/trafego/planejamento': typeof AuthenticatedTrafegoPlanejamentoRoute
   '/contingencia': typeof AuthenticatedContingenciaIndexRoute
+  '/tiktok': typeof AuthenticatedTiktokIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -240,6 +256,7 @@ export interface FileRoutesById {
   '/_authenticated/dashboard': typeof AuthenticatedDashboardRoute
   '/_authenticated/notificacoes': typeof AuthenticatedNotificacoesRoute
   '/_authenticated/perfil': typeof AuthenticatedPerfilRoute
+  '/_authenticated/tiktok': typeof AuthenticatedTiktokRouteWithChildren
   '/_authenticated/configuracoes/empresa': typeof AuthenticatedConfiguracoesEmpresaRoute
   '/_authenticated/configuracoes/integracoes': typeof AuthenticatedConfiguracoesIntegracoesRoute
   '/_authenticated/configuracoes/usuarios': typeof AuthenticatedConfiguracoesUsuariosRoute
@@ -255,6 +272,7 @@ export interface FileRoutesById {
   '/_authenticated/trafego/performance': typeof AuthenticatedTrafegoPerformanceRoute
   '/_authenticated/trafego/planejamento': typeof AuthenticatedTrafegoPlanejamentoRoute
   '/_authenticated/contingencia/': typeof AuthenticatedContingenciaIndexRoute
+  '/_authenticated/tiktok/': typeof AuthenticatedTiktokIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
@@ -268,6 +286,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/notificacoes'
     | '/perfil'
+    | '/tiktok'
     | '/configuracoes/empresa'
     | '/configuracoes/integracoes'
     | '/configuracoes/usuarios'
@@ -283,6 +302,7 @@ export interface FileRouteTypes {
     | '/trafego/performance'
     | '/trafego/planejamento'
     | '/contingencia/'
+    | '/tiktok/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
@@ -308,6 +328,7 @@ export interface FileRouteTypes {
     | '/trafego/performance'
     | '/trafego/planejamento'
     | '/contingencia'
+    | '/tiktok'
   id:
     | '__root__'
     | '/'
@@ -320,6 +341,7 @@ export interface FileRouteTypes {
     | '/_authenticated/dashboard'
     | '/_authenticated/notificacoes'
     | '/_authenticated/perfil'
+    | '/_authenticated/tiktok'
     | '/_authenticated/configuracoes/empresa'
     | '/_authenticated/configuracoes/integracoes'
     | '/_authenticated/configuracoes/usuarios'
@@ -335,6 +357,7 @@ export interface FileRouteTypes {
     | '/_authenticated/trafego/performance'
     | '/_authenticated/trafego/planejamento'
     | '/_authenticated/contingencia/'
+    | '/_authenticated/tiktok/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -390,6 +413,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/_authenticated/tiktok': {
+      id: '/_authenticated/tiktok'
+      path: '/tiktok'
+      fullPath: '/tiktok'
+      preLoaderRoute: typeof AuthenticatedTiktokRouteImport
+      parentRoute: typeof AuthenticatedRoute
+    }
     '/_authenticated/perfil': {
       id: '/_authenticated/perfil'
       path: '/perfil'
@@ -417,6 +447,13 @@ declare module '@tanstack/react-router' {
       fullPath: '/contingencia'
       preLoaderRoute: typeof AuthenticatedContingenciaRouteImport
       parentRoute: typeof AuthenticatedRoute
+    }
+    '/_authenticated/tiktok/': {
+      id: '/_authenticated/tiktok/'
+      path: '/'
+      fullPath: '/tiktok/'
+      preLoaderRoute: typeof AuthenticatedTiktokIndexRouteImport
+      parentRoute: typeof AuthenticatedTiktokRoute
     }
     '/_authenticated/contingencia/': {
       id: '/_authenticated/contingencia/'
@@ -540,11 +577,23 @@ const AuthenticatedContingenciaRouteWithChildren =
     AuthenticatedContingenciaRouteChildren,
   )
 
+interface AuthenticatedTiktokRouteChildren {
+  AuthenticatedTiktokIndexRoute: typeof AuthenticatedTiktokIndexRoute
+}
+
+const AuthenticatedTiktokRouteChildren: AuthenticatedTiktokRouteChildren = {
+  AuthenticatedTiktokIndexRoute: AuthenticatedTiktokIndexRoute,
+}
+
+const AuthenticatedTiktokRouteWithChildren =
+  AuthenticatedTiktokRoute._addFileChildren(AuthenticatedTiktokRouteChildren)
+
 interface AuthenticatedRouteChildren {
   AuthenticatedContingenciaRoute: typeof AuthenticatedContingenciaRouteWithChildren
   AuthenticatedDashboardRoute: typeof AuthenticatedDashboardRoute
   AuthenticatedNotificacoesRoute: typeof AuthenticatedNotificacoesRoute
   AuthenticatedPerfilRoute: typeof AuthenticatedPerfilRoute
+  AuthenticatedTiktokRoute: typeof AuthenticatedTiktokRouteWithChildren
   AuthenticatedConfiguracoesEmpresaRoute: typeof AuthenticatedConfiguracoesEmpresaRoute
   AuthenticatedConfiguracoesIntegracoesRoute: typeof AuthenticatedConfiguracoesIntegracoesRoute
   AuthenticatedConfiguracoesUsuariosRoute: typeof AuthenticatedConfiguracoesUsuariosRoute
@@ -566,6 +615,7 @@ const AuthenticatedRouteChildren: AuthenticatedRouteChildren = {
   AuthenticatedDashboardRoute: AuthenticatedDashboardRoute,
   AuthenticatedNotificacoesRoute: AuthenticatedNotificacoesRoute,
   AuthenticatedPerfilRoute: AuthenticatedPerfilRoute,
+  AuthenticatedTiktokRoute: AuthenticatedTiktokRouteWithChildren,
   AuthenticatedConfiguracoesEmpresaRoute:
     AuthenticatedConfiguracoesEmpresaRoute,
   AuthenticatedConfiguracoesIntegracoesRoute:

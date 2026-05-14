@@ -5,7 +5,8 @@ export const Route = createFileRoute("/_authenticated/tiktok")({
   component: TikTokLayout,
 });
 
-const TABS = [
+interface Tab { to: string; label: string; exact?: boolean }
+const TABS: Tab[] = [
   { to: "/tiktok", label: "Dashboard", exact: true },
   { to: "/tiktok/launch", label: "Lançar" },
   { to: "/tiktok/campaigns", label: "Campanhas" },
@@ -14,7 +15,7 @@ const TABS = [
   { to: "/tiktok/pixels", label: "Pixels" },
   { to: "/tiktok/proxies", label: "Proxies" },
   { to: "/tiktok/logs", label: "Logs" },
-] as const;
+];
 
 function TikTokLayout() {
   const path = useRouterState({ select: (s) => s.location.pathname });
@@ -39,7 +40,7 @@ function TikTokLayout() {
           return (
             <Link
               key={t.to}
-              to={t.to}
+              to={t.to as string}
               className={`px-3 py-2 text-sm border-b-2 -mb-px whitespace-nowrap transition-colors ${
                 active
                   ? "border-primary text-primary"
