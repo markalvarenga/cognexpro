@@ -826,6 +826,42 @@ export type Database = {
           },
         ]
       }
+      tiktok_ad_accounts: {
+        Row: {
+          advertiser_id: string
+          advertiser_name: string | null
+          bc_id: string | null
+          created_at: string
+          currency: string
+          id: string
+          proxy: string | null
+          status: string
+          user_id: string
+        }
+        Insert: {
+          advertiser_id: string
+          advertiser_name?: string | null
+          bc_id?: string | null
+          created_at?: string
+          currency?: string
+          id?: string
+          proxy?: string | null
+          status?: string
+          user_id: string
+        }
+        Update: {
+          advertiser_id?: string
+          advertiser_name?: string | null
+          bc_id?: string | null
+          created_at?: string
+          currency?: string
+          id?: string
+          proxy?: string | null
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
       tiktok_assets: {
         Row: {
           asset_type: string
@@ -911,6 +947,138 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
+      }
+      tiktok_launch_history: {
+        Row: {
+          accounts_count: number
+          ads_created: number
+          campaign_type: string
+          campaigns_created: number
+          config: Json | null
+          created_at: string
+          id: string
+          logs: Json
+          status: string
+          user_id: string
+        }
+        Insert: {
+          accounts_count?: number
+          ads_created?: number
+          campaign_type: string
+          campaigns_created?: number
+          config?: Json | null
+          created_at?: string
+          id?: string
+          logs?: Json
+          status?: string
+          user_id: string
+        }
+        Update: {
+          accounts_count?: number
+          ads_created?: number
+          campaign_type?: string
+          campaigns_created?: number
+          config?: Json | null
+          created_at?: string
+          id?: string
+          logs?: Json
+          status?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      tiktok_presets: {
+        Row: {
+          campaign_type: string
+          config: Json
+          created_at: string
+          id: string
+          name: string
+          user_id: string
+        }
+        Insert: {
+          campaign_type: string
+          config: Json
+          created_at?: string
+          id?: string
+          name: string
+          user_id: string
+        }
+        Update: {
+          campaign_type?: string
+          config?: Json
+          created_at?: string
+          id?: string
+          name?: string
+          user_id?: string
+        }
+        Relationships: []
+      }
+      tiktok_spark_profiles: {
+        Row: {
+          advertiser_id: string
+          created_at: string
+          display_name: string | null
+          id: string
+          identity_id: string
+          identity_type: string
+          profile_image: string | null
+          user_id: string
+        }
+        Insert: {
+          advertiser_id: string
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          identity_id: string
+          identity_type: string
+          profile_image?: string | null
+          user_id: string
+        }
+        Update: {
+          advertiser_id?: string
+          created_at?: string
+          display_name?: string | null
+          id?: string
+          identity_id?: string
+          identity_type?: string
+          profile_image?: string | null
+          user_id?: string
+        }
+        Relationships: []
+      }
+      tiktok_tokens: {
+        Row: {
+          access_token_enc: string | null
+          advertiser_ids: string[]
+          bc_id: string | null
+          created_at: string
+          expires_at: string | null
+          id: string
+          updated_at: string
+          user_id: string
+        }
+        Insert: {
+          access_token_enc?: string | null
+          advertiser_ids?: string[]
+          bc_id?: string | null
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          updated_at?: string
+          user_id: string
+        }
+        Update: {
+          access_token_enc?: string | null
+          advertiser_ids?: string[]
+          bc_id?: string | null
+          created_at?: string
+          expires_at?: string | null
+          id?: string
+          updated_at?: string
+          user_id?: string
+        }
+        Relationships: []
       }
       transactions: {
         Row: {
