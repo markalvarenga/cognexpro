@@ -135,8 +135,8 @@ export const launchSmart = createServerFn({ method: "POST" })
       accounts_count: data.advertiser_ids.length,
       campaigns_created: totalCampaigns,
       ads_created: totalAds,
-      logs: results,
-      config: data,
+      logs: JSON.parse(JSON.stringify(results)),
+      config: JSON.parse(JSON.stringify(data)),
       status: results.every((r) => r.ok) ? "completed" : "partial",
     });
 
